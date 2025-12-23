@@ -34,15 +34,16 @@ export async function createSession(adminId: number, ipAddress?: string, userAge
     INSERT INTO admin_sessions (admin_id, session_token, expires_at, ip_address, user_agent)
     VALUES (${adminId}, ${sessionToken}, ${expiresAt}, ${ipAddress || null}, ${userAgent || null})
   `
-
+  const isProd = process.env.NODE_ENV === "production"
   // Set secure HTTP-only cookie
   const cookieStore = await cookies()
   cookieStore.set("admin_session", sessionToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isProd,
+    sameSite: isProd ? "none": "lax",
     expires: expiresAt,
-    path: "/admin",
+    // path: "/admin",
+    path: "/",
   })
 
   return sessionToken
@@ -129,7 +130,6 @@ export async function cleanupExpiredSessions(): Promise<void> {
  */
 export async function requireAuth(): Promise<AdminUser> {
   const admin = await validateSession()
-
   if (!admin) {
     throw new Error("Unauthorized")
   }

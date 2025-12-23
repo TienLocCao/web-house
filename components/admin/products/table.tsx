@@ -8,21 +8,28 @@ import type { Column, SortItem } from "@/lib/types/table"
 interface ProductsTableProps {
   initialData: Product[]
   initialTotal: number
+  onEdit: (product: Product) => void
+  onDelete: (product: Product) => void
+  refreshKey?: number
 }
 
-export function ProductsTable({ initialData,initialTotal }: ProductsTableProps) {
+export function ProductsTable({ initialData,initialTotal, onEdit, onDelete, refreshKey }: ProductsTableProps) {
   const [data, setData] = useState<Product[]>(initialData)
   const [total, setTotal] = useState(initialTotal)
   const [page, setPage] = useState(1)
   const [limit] = useState(5)
   const [sort, setSort] = useState<SortItem[]>([])
-  const [loading, setLoading] = useState(false)
-  console.log("start", loading);
+  const [loading, setLoading] = useState(true)
 
   const columns: Column<Product>[] = [
     { key: "name", header: "Name", sortable: true },
+    { key: "slug", header: "Slug", sortable: true },
+    { key: "category_name", header: "Category", sortable: true },
     { key: "price", header: "Price", sortable: true },
     { key: "stock", header: "Stock", sortable: true },
+    { key: "is_featured", header: "Is Featured", sortable: true },
+    { key: "is_available", header: "Status", sortable: true },
+    { key: "image_url", header: "Image", sortable: false },
   ]
 
   useEffect(() => {
@@ -38,8 +45,14 @@ export function ProductsTable({ initialData,initialTotal }: ProductsTableProps) 
         )
         if (!res.ok) throw new Error("Failed to fetch products")
         const json: { items: Product[]; total: number } = await res.json()
-
         if (!ignore) {
+          // If current page becomes empty after an operation (e.g. delete last item),
+          // step back one page and refetch.
+          if (Array.isArray(json.items) && json.items.length === 0 && page > 1) {
+            setPage((p) => Math.max(1, p - 1))
+            return
+          }
+
           setData(json.items)
           setTotal(json.total)
         }
@@ -54,8 +67,7 @@ export function ProductsTable({ initialData,initialTotal }: ProductsTableProps) 
     return () => {
       ignore = true
     }
-  }, [page, sort])
-  console.log("end", loading);
+  }, [page, sort, refreshKey])
 
   return (
     <CoreTable
@@ -68,6 +80,8 @@ export function ProductsTable({ initialData,initialTotal }: ProductsTableProps) 
       isLoading={loading}
       onPageChange={setPage}
       onSortChange={setSort}
+      onEdit={onEdit}
+      onDelete={onDelete}
     />
   )
 }

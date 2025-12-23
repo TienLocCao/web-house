@@ -31,6 +31,8 @@ interface CoreTableProps<T extends { id: number }> {
   onPageChange: (page: number) => void
   onSortChange: (sort: SortItem[]) => void
   onSelectChange?: (ids: number[]) => void
+  onEdit?: (item: T) => void
+  onDelete?: (item: T) => void
 }
 
 export function CoreTable<T extends { id: number }>({
@@ -44,6 +46,8 @@ export function CoreTable<T extends { id: number }>({
   onPageChange,
   onSortChange,
   onSelectChange,
+  onEdit,
+  onDelete,
 }: CoreTableProps<T>) {
   const [selectedIds, setSelectedIds] = useState<number[]>([])
 
@@ -186,11 +190,11 @@ export function CoreTable<T extends { id: number }>({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onEdit && onEdit(row)}>
                           <Edit className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive focus:text-destructive">
+                        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => onDelete && onDelete(row)}>
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete
                         </DropdownMenuItem>

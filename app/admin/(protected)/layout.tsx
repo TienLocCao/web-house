@@ -7,7 +7,6 @@ import "./globals.css"
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   // Require authentication for all admin routes
   const admin = await validateSession()
-  console.log("AdminLayout admin:", admin)
 
   if (!admin) {
     redirect("/admin/login")

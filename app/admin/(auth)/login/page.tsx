@@ -9,7 +9,6 @@ export const metadata: Metadata = {
 }
 
 export default async function AdminLoginPage() {
-  console.log("AdminLoginPage loaded")
   // Redirect if already logged in
   const admin = await validateSession()
   if (admin) {
