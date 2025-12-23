@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useToast } from "@/hooks/use-toast"
+import { useRoomTypes } from "@/hooks/use-room-types"
 import {
   Dialog,
   DialogTrigger,
@@ -24,6 +25,8 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/select"
+import { ImageUploader } from "@/components/admin/products/ImageUploader"
+import { uploadImage } from "@/lib/services/image-upload"
 
 type ProductFormState = {
   name: string
@@ -78,6 +81,7 @@ export default function ProductCreateEditDialog({
   onSaved?: () => void
 }) {
   const { toast } = useToast()
+  const { values: roomTypes, isLoading: roomTypesLoading } = useRoomTypes()
 
   // ===== form =====
   const [form, setForm] = useState<ProductFormState>(EMPTY_FORM)
@@ -145,36 +149,6 @@ export default function ProductCreateEditDialog({
     setFieldErrors(errs)
   }
 
-  async function uploadImage(file: File): Promise<string> {
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"]
-    if (!allowedTypes.includes(file.type)) {
-      applyFieldErrors([{ path: "image", message: "Invalid file type" }])
-      throw new Error("Invalid file type")
-    }
-
-    const maxBytes = 5 * 1024 * 1024 // 5MB
-    if (file.size > maxBytes) {
-      applyFieldErrors([{ path: "image", message: "File too large (max 5MB)" }])
-      throw new Error("File too large")
-    }
-
-    const fd = new FormData()
-    fd.append("image", file)
-
-    const res = await fetch("/api/admin/products/upload", {
-      method: "POST",
-      body: fd,
-    })
-
-    const json = await res.json().catch(() => null)
-    if (!res.ok) {
-      if (Array.isArray(json?.errors)) applyFieldErrors(json.errors)
-      throw new Error(json?.message || "Upload image failed")
-    }
-
-    return json.image_url
-  }
-
   function buildPayload(finalImageUrl: string): ProductPayload {
     return {
       name: form.name.trim(),
@@ -218,7 +192,7 @@ export default function ProductCreateEditDialog({
       let finalImageUrl = form.image_url
 
       if (imageFile) {
-        finalImageUrl = await uploadImage(imageFile)
+        finalImageUrl = await uploadImage(imageFile, form.image_url)
         setForm((prev) => ({ ...prev, image_url: finalImageUrl }))
         setPreviewUrl(finalImageUrl)
       }
@@ -297,9 +271,21 @@ export default function ProductCreateEditDialog({
                   <SelectValue placeholder="Select room" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="living_room">Living Room</SelectItem>
-                  <SelectItem value="bedroom">Bedroom</SelectItem>
-                  <SelectItem value="kitchen">Kitchen</SelectItem>
+                  {roomTypesLoading && (
+                    <SelectItem value="" disabled>
+                      Loading...
+                    </SelectItem>
+                  )}
+                  {!roomTypesLoading && roomTypes.length === 0 && (
+                    <SelectItem value="" disabled>
+                      No room types
+                    </SelectItem>
+                  )}
+                  {roomTypes.map((v: string) => (
+                    <SelectItem key={v} value={v}>
+                      {v.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FieldError errors={(fieldErrors.room_type || []).map((m) => ({ message: m }))} />
@@ -344,49 +330,21 @@ export default function ProductCreateEditDialog({
               </label>
             </div>
 
-            <div>
-              <Label>Image</Label>
-              {previewUrl && (
-                <img
-                  src={previewUrl}
-                  className="mb-2 h-24 rounded object-cover"
-                />
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const f = e.target.files?.[0]
-                  if (!f) return
+            <ImageUploader
+              value={form.image_url}
+              error={fieldErrors.image_url}
+              onChange={(file, preview) => {
+                setImageFile(file)
+                setPreviewUrl(preview)
+                setFieldErrors((prev) => {
+                  const n = { ...prev }
+                  delete n.image
+                  return n
+                })
+              }}
+            />
 
-                  const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"]
-                  const maxBytes = 5 * 1024 * 1024
-                  if (!allowed.includes(f.type)) {
-                    applyFieldErrors([{ path: "image", message: "Invalid file type" }])
-                    setImageFile(null)
-                    setPreviewUrl("")
-                    return
-                  }
-                  if (f.size > maxBytes) {
-                    applyFieldErrors([{ path: "image", message: "File too large (max 5MB)" }])
-                    setImageFile(null)
-                    setPreviewUrl("")
-                    return
-                  }
 
-                  // clear previous image errors
-                  setFieldErrors((prev) => {
-                    const n = { ...prev }
-                    delete n.image
-                    return n
-                  })
-
-                  setImageFile(f)
-                  setPreviewUrl(URL.createObjectURL(f))
-                }}
-              />
-              <FieldError errors={(fieldErrors.image || []).map((m) => ({ message: m }))} />
-            </div>
           </div>
 
           <div>

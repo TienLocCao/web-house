@@ -25,7 +25,7 @@ export const ProductCreateSchema = z.object({
 
   room_type: RoomTypeEnum,
 
-  image_url: z.string().url(),
+  image_url: z.string(),
 
   gallery: z.array(z.string().url()).optional().default([]),
 

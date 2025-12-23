@@ -3,6 +3,8 @@ import { sql } from "@/lib/db"
 import { requireAuth } from "@/lib/auth"
 import { ProductUpdateSchema } from "@/lib/schemas/product.schema"
 import { z } from "zod"
+import fs from "fs/promises"
+import path from "path"
 
 export const runtime = "nodejs"
 
@@ -71,8 +73,41 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { id } = await params
   await requireAuth()
-  await sql`DELETE FROM products WHERE id = ${Number(id)}`
+  const { id: productId } = await params
+
+  // 1. Lấy image_url trước
+  const [product] = await sql`
+    SELECT image_url
+    FROM products
+    WHERE id = ${productId}
+  `
+  if (!product) {
+    return NextResponse.json(
+      { message: "Product not found" },
+      { status: 404 }
+    )
+  }
+
+  // 2. Nếu có image_url thì xóa file
+  if (product.image_url) {
+    try {
+      // image_url dạng: /uploads/abc.jpg
+      const filePath = path.join(
+        process.cwd(),
+        "public",
+        product.image_url
+      )
+
+      await fs.unlink(filePath)
+    } catch (err) {
+      // Không throw error để tránh fail delete product
+      console.warn("Cannot delete image file:", err)
+    }
+  }
+
+  // 3. Xóa product
+  await sql`DELETE FROM products WHERE id = ${productId}`
+
   return NextResponse.json({ message: "Product deleted" })
 }
