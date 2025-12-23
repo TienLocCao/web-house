@@ -14,7 +14,6 @@ export async function getProducts({
   sort?: any[]
   filter?: any
 }): Promise<PaginatedResult<Product>> {
-
   const { where, values } = buildWhere(filter)
   const orderBy = buildOrderBy(sort)
   const { offset } = buildPagination(page, limit)

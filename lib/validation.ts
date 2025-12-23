@@ -20,7 +20,7 @@ export const ProductCreateSchema = z.object({
   original_price: z.number().min(0).optional(),
   category_id: z.number().optional(),
   room_type: z.enum(["living_room", "dining_room", "bedroom", "kitchen", "bathroom", "office"]),
-  image_url: z.string().url(),
+  image_url: z.string(),
   stock: z.number().min(0).default(0),
   is_featured: z.boolean().default(false),
 })
