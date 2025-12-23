@@ -1,14 +1,13 @@
-export type SortOrder = "asc" | "desc"
+export type SortDirection = 'asc' | 'desc'
 
 export interface SortItem {
   key: string
-  order: SortOrder
+  direction: SortDirection
 }
 
 export interface Column<T> {
-  key: string
+  key: keyof T | string
   header: string
   sortable?: boolean
-  width?: number
   render?: (row: T) => React.ReactNode
 }
