@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import type { Product } from "@/lib/types/product"
 import { CoreTable } from "@/components/core/CoreTable"
 import type { Column, SortItem } from "@/lib/types/table"
+import { BulkDeleteBar } from "@/components/admin/products/BulkDeleteBar"
 
 interface ProductsTableProps {
   initialData: Product[]
@@ -13,25 +14,46 @@ interface ProductsTableProps {
   refreshKey?: number
 }
 
-export function ProductsTable({ initialData,initialTotal, onEdit, onDelete, refreshKey }: ProductsTableProps) {
+export function ProductsTable({
+  initialData,
+  initialTotal,
+  onEdit,
+  onDelete,
+  refreshKey,
+}: ProductsTableProps) {
   const [data, setData] = useState<Product[]>(initialData)
   const [total, setTotal] = useState(initialTotal)
   const [page, setPage] = useState(1)
   const [limit] = useState(5)
   const [sort, setSort] = useState<SortItem[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
+  /* ---------------- columns ---------------- */
   const columns: Column<Product>[] = [
     { key: "name", header: "Name", sortable: true },
     { key: "slug", header: "Slug", sortable: true },
     { key: "category_name", header: "Category", sortable: true },
     { key: "price", header: "Price", sortable: true },
     { key: "stock", header: "Stock", sortable: true },
-    { key: "is_featured", header: "Is Featured", sortable: true },
-    { key: "is_available", header: "Status", sortable: true },
-    { key: "image_url", header: "Image", sortable: false },
+    { key: "is_featured", header: "Featured", sortable: true },
+    { key: "is_available", header: "Available", sortable: true },
+    {
+      key: "image_url",
+      header: "Image",
+      sortable: false,
+      render: (row) =>
+        row.image_url ? (
+          <img
+            src={row.image_url}
+            className="h-10 w-10 rounded object-cover"
+          />
+        ) : (
+          "-"
+        ),
+    },
   ]
 
+  /* ---------------- fetch data ---------------- */
   useEffect(() => {
     let ignore = false
 
@@ -39,20 +61,20 @@ export function ProductsTable({ initialData,initialTotal, onEdit, onDelete, refr
       setLoading(true)
       try {
         const res = await fetch(
-          `/api/admin/products?page=${page}&sort=${encodeURIComponent(
+          `/api/admin/products?page=${page}&limit=${limit}&sort=${encodeURIComponent(
             JSON.stringify(sort)
           )}`
         )
+
         if (!res.ok) throw new Error("Failed to fetch products")
+
         const json: { items: Product[]; total: number } = await res.json()
+
         if (!ignore) {
-          // If current page becomes empty after an operation (e.g. delete last item),
-          // step back one page and refetch.
-          if (Array.isArray(json.items) && json.items.length === 0 && page > 1) {
+          if (json.items.length === 0 && page > 1) {
             setPage((p) => Math.max(1, p - 1))
             return
           }
-
           setData(json.items)
           setTotal(json.total)
         }
@@ -69,6 +91,26 @@ export function ProductsTable({ initialData,initialTotal, onEdit, onDelete, refr
     }
   }, [page, sort, refreshKey])
 
+  /* ---------------- bulk delete ---------------- */
+  const deleteMany = async (ids: number[], mode: string) => {
+    console.log("delete ids", ids, mode)
+    if (ids.length === 0 && mode !== "all") return
+    const LEN = mode === "all" ? total : ids.length
+    
+
+    if (!confirm(`Delete ${LEN} products?`)) return
+
+    await fetch("/api/admin/products/bulk-delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids, mode }),
+    })
+
+    // reload current page
+    setPage(1)
+  }
+
+  /* ---------------- render ---------------- */
   return (
     <CoreTable
       columns={columns}
@@ -82,6 +124,16 @@ export function ProductsTable({ initialData,initialTotal, onEdit, onDelete, refr
       onSortChange={setSort}
       onEdit={onEdit}
       onDelete={onDelete}
+      renderBulkActionBar={(s) =>
+        s.mode !== "none" ? (
+          <BulkDeleteBar
+            count={s.selectedCount}
+            mode={s.mode} // chỉ page | all
+            onClear={s.clear}
+            onDelete={() => deleteMany(s.selectedIds, s.mode)}
+          />
+        ) : null
+      }
     />
   )
 }

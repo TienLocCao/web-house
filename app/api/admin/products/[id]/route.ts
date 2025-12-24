@@ -5,6 +5,7 @@ import { ProductUpdateSchema } from "@/lib/schemas/product.schema"
 import { z } from "zod"
 import fs from "fs/promises"
 import path from "path"
+import { deleteImageByUrl } from "@/lib/fs"
 
 export const runtime = "nodejs"
 
@@ -76,7 +77,6 @@ export async function DELETE(
   await requireAuth()
   const { id: productId } = await params
 
-  // 1. Lấy image_url trước
   const [product] = await sql`
     SELECT image_url
     FROM products
@@ -89,19 +89,10 @@ export async function DELETE(
     )
   }
 
-  // 2. Nếu có image_url thì xóa file
   if (product.image_url) {
     try {
-      // image_url dạng: /uploads/abc.jpg
-      const filePath = path.join(
-        process.cwd(),
-        "public",
-        product.image_url
-      )
-
-      await fs.unlink(filePath)
+      await deleteImageByUrl(product.image_url)
     } catch (err) {
-      // Không throw error để tránh fail delete product
       console.warn("Cannot delete image file:", err)
     }
   }
