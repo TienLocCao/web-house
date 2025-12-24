@@ -44,7 +44,6 @@ interface CoreTableProps<T extends { id: number }> {
   onEdit?: (item: T) => void
   onDelete?: (item: T) => void
 
-  /** inject từ ngoài */
   renderBulkActionBar?: (
     selection: ReturnType<typeof useTableSelection>
   ) => React.ReactNode
@@ -96,142 +95,163 @@ export function CoreTable<T extends { id: number }>({
   const getSortIndex = (key: string) =>
     sort.findIndex((s) => s.key === key)
 
-  /* ---------- RENDER ---------- */
+  const headerCheckboxState = () => {
+    if (selection.mode === "all") return true
+    if (selection.isIndeterminate) return "indeterminate"
+    return selection.isPageAllSelected
+  }
+
   return (
     <div className="space-y-4 relative">
       {/* Overlay loading */}
       {isLoading && (
-        <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center">
+        <div className="absolute inset-0 bg-white/60 z-20 flex items-center justify-center">
           <span className="animate-spin text-lg">⏳</span>
         </div>
       )}
 
-      {/* Bulk Action Bar (inject từ ngoài) */}
+      {/* Bulk Action Bar */}
       {selection.selectedCount > 0 &&
         renderBulkActionBar?.(selection)}
 
-      <Card>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-10">
-                  <Checkbox
-                    checked={
-                      selection.isIndeterminate
-                        ? "indeterminate"
-                        : selection.isPageAllSelected
-                    }
-                    onCheckedChange={(v) =>
-                      selection.toggleSelectPage(v === true)
-                    }
-                    disabled={isLoading}
-                  />
-                </TableHead>
-
-                {columns.map((col) => {
-                  const sortIndex = getSortIndex(col.key as string)
-                  const sortItem = sort[sortIndex]
-
-                  return (
-                    <TableHead
-                      key={String(col.key)}
-                      onClick={() =>
-                        col.sortable && toggleSort(col.key as string)
-                      }
-                      className={cn(
-                        col.sortable &&
-                          !isLoading &&
-                          "cursor-pointer select-none"
-                      )}
-                    >
-                      <div className="flex items-center gap-1">
-                        {col.header}
-                        {sortItem && (
-                          <span className="text-xs text-muted-foreground">
-                            {sortItem.direction === "asc" ? "↑" : "↓"}
-                            <sup>{sortIndex + 1}</sup>
-                          </span>
-                        )}
-                      </div>
-                    </TableHead>
-                  )
-                })}
-
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {isLoading ? (
-                <CoreTableSkeleton
-                  rows={limit}
-                  cols={columns.length + 2}
-                />
-              ) : data.length === 0 ? (
+      <Card className="pt-0">
+        <CardContent className="p-0">
+          {/* scroll container */}
+          <div className="relative overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell
-                    colSpan={columns.length + 2}
-                    className="text-center py-8 text-muted-foreground"
-                  >
-                    No data
-                  </TableCell>
-                </TableRow>
-              ) : (
-                data.map((row) => (
-                  <TableRow key={row.id} className="hover:bg-muted/50">
-                    <TableCell>
-                      <Checkbox
-                        checked={selection.isRowSelected(row.id)}
-                        onCheckedChange={(v) =>
-                          selection.toggleRow(row.id, v === true)
+                  {/* Checkbox column */}
+                  <TableHead className="w-10 sticky left-0 bg-background z-10">
+                    <Checkbox
+                      checked={headerCheckboxState()}
+                      onCheckedChange={(v) =>
+                        selection.toggleSelectPage(v === true)
+                      }
+                      disabled={isLoading}
+                    />
+                  </TableHead>
+
+                  {/* Data columns */}
+                  {columns.map((col) => {
+                    const sortIndex = getSortIndex(col.key as string)
+                    const sortItem = sort[sortIndex]
+
+                    return (
+                      <TableHead
+                        key={String(col.key)}
+                        onClick={() =>
+                          col.sortable &&
+                          toggleSort(col.key as string)
                         }
-                      />
-                    </TableCell>
+                        className={cn(
+                          col.sortable &&
+                            !isLoading &&
+                            "cursor-pointer select-none"
+                        )}
+                      >
+                        <div className="flex items-center gap-1">
+                          {col.header}
+                          {sortItem && (
+                            <span className="text-xs text-muted-foreground">
+                              {sortItem.direction === "asc"
+                                ? "↑"
+                                : "↓"}
+                              <sup>{sortIndex + 1}</sup>
+                            </span>
+                          )}
+                        </div>
+                      </TableHead>
+                    )
+                  })}
 
-                    {columns.map((col) => (
-                      <TableCell key={String(col.key)}>
-                        {col.render
-                          ? col.render(row)
-                          : String((row as any)[col.key])}
-                      </TableCell>
-                    ))}
+                  {/* Actions */}
+                  <TableHead className="text-right sticky right-0 bg-background z-10 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.1)]">
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
 
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => onEdit?.(row)}
-                          >
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-destructive focus:text-destructive"
-                            onClick={() => onDelete?.(row)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+              <TableBody>
+                {isLoading ? (
+                  <CoreTableSkeleton
+                    rows={limit}
+                    cols={columns.length + 2}
+                  />
+                ) : data.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length + 2}
+                      className="text-center py-8 text-muted-foreground"
+                    >
+                      No data
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  data.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      className="hover:bg-muted/50"
+                    >
+                      {/* Row checkbox */}
+                      <TableCell className="sticky left-0 bg-background z-10">
+                        <Checkbox
+                          checked={selection.isRowSelected(row.id)}
+                          onCheckedChange={(v) =>
+                            selection.toggleRow(row.id, v === true)
+                          }
+                        />
+                      </TableCell>
 
-          {/* Select all cross-page hint */}
+                      {/* Data cells */}
+                      {columns.map((col) => (
+                        <TableCell key={String(col.key)}>
+                          {col.render
+                            ? col.render(row)
+                            : String((row as any)[col.key])}
+                        </TableCell>
+                      ))}
+
+                      {/* Actions cell */}
+                      <TableCell className="text-right sticky right-0 bg-background z-10 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.1)]">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => onEdit?.(row)}
+                            >
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-destructive focus:text-destructive"
+                              onClick={() => onDelete?.(row)}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Cross-page select hint */}
           {selection.mode === "page" &&
             selection.isPageAllSelected &&
             total > data.length && (
-              <div className="mt-2 text-sm text-muted-foreground">
+              <div className="mt-2 text-sm text-muted-foreground px-4">
                 Selected {data.length} items.
                 <button
                   className="ml-2 underline"
@@ -243,7 +263,7 @@ export function CoreTable<T extends { id: number }>({
             )}
 
           {/* Pagination */}
-          <div className="flex items-center justify-between border-t pt-4 mt-4">
+          <div className="flex items-center justify-between border-t pt-4 mt-4 px-4">
             <div className="text-sm text-muted-foreground">
               Showing {(page - 1) * limit + 1} to{" "}
               {Math.min(page * limit, total)} of {total} items

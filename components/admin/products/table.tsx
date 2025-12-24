@@ -92,15 +92,18 @@ export function ProductsTable({
   }, [page, sort, refreshKey])
 
   /* ---------------- bulk delete ---------------- */
-  const deleteMany = async (ids: number[]) => {
-    if (ids.length === 0) return
+  const deleteMany = async (ids: number[], mode: string) => {
+    console.log("delete ids", ids, mode)
+    if (ids.length === 0 && mode !== "all") return
+    const LEN = mode === "all" ? total : ids.length
+    
 
-    if (!confirm(`Delete ${ids.length} products?`)) return
+    if (!confirm(`Delete ${LEN} products?`)) return
 
     await fetch("/api/admin/products/bulk-delete", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids }),
+      body: JSON.stringify({ ids, mode }),
     })
 
     // reload current page
@@ -127,7 +130,7 @@ export function ProductsTable({
             count={s.selectedCount}
             mode={s.mode} // chỉ page | all
             onClear={s.clear}
-            onDelete={() => deleteMany(s.selectedIds)}
+            onDelete={() => deleteMany(s.selectedIds, s.mode)}
           />
         ) : null
       }
