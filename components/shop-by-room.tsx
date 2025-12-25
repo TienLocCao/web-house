@@ -3,14 +3,16 @@
 import { useEffect, useRef } from "react"
 import { RoomCard } from "@/components/room-card"
 import { useProducts } from "@/lib/use-products"
+import type { Product } from "@/lib/types/product"
 
-export function ShopByRoom() {
+export function ShopByRoom({ initialProductsByRoom }: { initialProductsByRoom?: { living_room?: Product[]; dining_room?: Product[]; bedroom?: Product[] } }) {
   const sectionRef = useRef<HTMLDivElement>(null)
 
   const { products: livingRoomProducts } = useProducts({ room_type: "living_room", limit: 1 })
   const { products: diningRoomProducts } = useProducts({ room_type: "dining_room", limit: 1 })
   const { products: bedroomProducts } = useProducts({ room_type: "bedroom", limit: 1 })
 
+  console.log("Living Room Products:", livingRoomProducts)
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -31,27 +33,28 @@ export function ShopByRoom() {
 
   const rooms = [
     {
-      title: "Living Room",
-      description:
-        "Create a welcoming space with comfortable sofas, elegant coffee tables, and stylish decor. Perfect for relaxation and entertaining guests.",
-      imageUrl: livingRoomProducts[0]?.image_url || "/modern-living-room.png",
+      title: livingRoomProducts[0]?.name || "Living Room",
+      description: livingRoomProducts[0]?.description,
+      imageUrl:
+        livingRoomProducts[0]?.image_url || initialProductsByRoom?.living_room?.[0]?.image_url,
       href: "/products?room_type=living_room",
     },
     {
-      title: "Dining Room",
-      description:
-        "Gather around beautiful dining tables with family and friends. Our collection features elegant designs that make every meal special.",
-      imageUrl: diningRoomProducts[0]?.image_url || "/elegant-dining-room.png",
+      title: diningRoomProducts[0]?.name || "Dining Room",
+      description: diningRoomProducts[0]?.description,
+      imageUrl:
+        diningRoomProducts[0]?.image_url || initialProductsByRoom?.dining_room?.[0]?.image_url,
       href: "/products?room_type=dining_room",
     },
     {
-      title: "Bedroom",
-      description:
-        "Transform your bedroom into a peaceful retreat with our comfortable beds, stylish nightstands, and cozy bedding collections.",
-      imageUrl: bedroomProducts[0]?.image_url || "/cozy-bedroom.png",
+      title: bedroomProducts[0]?.name || "Bedroom",
+      description: bedroomProducts[0]?.description,
+      imageUrl:
+        bedroomProducts[0]?.image_url || initialProductsByRoom?.bedroom?.[0]?.image_url,
       href: "/products?room_type=bedroom",
     },
   ]
+  console.log("Rooms Data:", rooms)
 
   return (
     <section id="categories" ref={sectionRef} className="py-24">
