@@ -4,8 +4,13 @@ import { useEffect, useRef } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { StatsDisplay } from "@/components/stats-display"
+import type { Stats } from "@/lib/types/stats"
+import { AppImage } from "@/components/ui/app-image"
+type HeroSectionProps = {
+  initialStats: Stats
+}
 
-export function HeroSection() {
+export function HeroSection({ initialStats }: HeroSectionProps) {
   const sectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -45,14 +50,14 @@ export function HeroSection() {
 
             {/* Statistics Grid */}
             <div className="pt-8">
-              <StatsDisplay />
+              <StatsDisplay initialStats={initialStats} />
             </div>
           </div>
 
           {/* Right Content - Featured Product */}
           <div className="relative observe-animate opacity-0" style={{ animationDelay: "0.2s" }}>
             <div className="relative aspect-square lg:aspect-[4/5] rounded-2xl overflow-hidden bg-muted">
-              <Image
+              <AppImage
                 src="/modern-black-chair-with-wooden-legs.jpg"
                 alt="Modern Black Chair"
                 fill
@@ -63,7 +68,7 @@ export function HeroSection() {
 
             {/* Floating Cards */}
             <div className="absolute top-4 right-4 bg-card/95 backdrop-blur-sm p-4 rounded-xl shadow-lg max-w-[200px]">
-              <Image
+              <AppImage
                 src="/cozy-living-room.png"
                 alt="Room Preview"
                 width={200}

@@ -1,58 +1,70 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
 import { rateLimit } from "@/lib/rate-limit"
+import { getClientIP } from "@/lib/request"
 
 export const runtime = "edge"
 export const dynamic = "force-dynamic"
-import { getClientIP } from "@/lib/request"
 
-// GET /api/projects - Get all projects
+// GET /api/projects
 export async function GET(request: NextRequest) {
   try {
-    // Rate limiting
+    /* ================= Rate limit ================= */
     const ip = getClientIP(request)
-    const rateLimitResult = rateLimit(`projects_${ip}`, {
-      interval: 60000,
+    const rate = rateLimit(`projects_${ip}`, {
+      interval: 60_000,
       maxRequests: 30,
     })
 
-    if (!rateLimitResult.success) {
+    if (!rate.success) {
       return NextResponse.json({ error: "Too many requests" }, { status: 429 })
     }
 
-    const searchParams = request.nextUrl.searchParams
-    const featured = searchParams.get("featured") === "true"
-    const limit = Number(searchParams.get("limit")) || 12
-    const offset = Number(searchParams.get("offset")) || 0
+    /* ================= Query params ================= */
+    const sp = request.nextUrl.searchParams
+    const featured = sp.get("featured") === "true"
+    const limit = Number(sp.get("limit")) || 12
+    const offset = Number(sp.get("offset")) || 0
 
-    let query = "SELECT * FROM projects WHERE 1=1"
-    const params: any[] = []
-    const paramIndex = 1
+    /* ================= WHERE ================= */
+    const where: any[] = []
 
     if (featured) {
-      query += " AND featured = true"
+      where.push(sql`featured = true`)
     }
 
-    query += " ORDER BY completion_date DESC NULLS LAST, created_at DESC"
-    query += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`
-    params.push(limit, offset)
+    const whereClause =
+      where.length > 0
+        ? sql`WHERE ${where.reduce((acc, cur, i) =>
+            i === 0 ? cur : sql`${acc} AND ${cur}`
+          )}`
+        : sql``
 
-    const projects = await sql`${query}, ${params}`
+    /* ================= DATA QUERY ================= */
+    const projects = await sql`
+      SELECT *
+      FROM projects
+      ${whereClause}
+      ORDER BY completion_date DESC NULLS LAST, created_at DESC
+      LIMIT ${limit}
+      OFFSET ${offset}
+    `
 
-    // Get total count
-    const countQuery = featured
-      ? "SELECT COUNT(*) as total FROM projects WHERE featured = true"
-      : "SELECT COUNT(*) as total FROM projects"
-    const [{ total }] = await sql`${countQuery}`
+    /* ================= COUNT QUERY ================= */
+    const [{ total }] = await sql`
+      SELECT COUNT(*)::int AS total
+      FROM projects
+      ${whereClause}
+    `
 
     return NextResponse.json(
       {
         data: projects,
         pagination: {
-          total: Number(total),
+          total,
           limit,
           offset,
-          hasMore: offset + limit < Number(total),
+          hasMore: offset + limit < total,
         },
       },
       {
@@ -61,8 +73,11 @@ export async function GET(request: NextRequest) {
         },
       },
     )
-  } catch (error) {
-    console.error("[v0] Error fetching projects:", error)
-    return NextResponse.json({ error: "Failed to fetch projects" }, { status: 500 })
+  } catch (err) {
+    console.error("[projects.GET]", err)
+    return NextResponse.json(
+      { error: "Failed to fetch projects" },
+      { status: 500 },
+    )
   }
 }

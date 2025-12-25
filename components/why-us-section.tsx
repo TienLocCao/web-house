@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
+import { AppImage } from "./ui/app-image"
 
 export function WhyUsSection() {
   const sectionRef = useRef<HTMLDivElement>(null)
@@ -55,7 +55,7 @@ export function WhyUsSection() {
           {/* Right Content - Image */}
           <div className="relative observe-animate opacity-0" style={{ animationDelay: "0.2s" }}>
             <div className="relative aspect-[4/5] rounded-2xl overflow-hidden">
-              <Image src="/elegant-dining-room-with-wooden-chair.jpg" alt="Dining Room Chair" fill className="object-cover" />
+              <AppImage src="/elegant-dining-room-with-wooden-chair.jpg" alt="Dining Room Chair" fill className="object-cover" />
             </div>
           </div>
         </div>

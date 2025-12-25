@@ -6,11 +6,15 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useProjects } from "@/lib/use-projects"
 
-export function ProjectsSection() {
+import type { Project } from "@/lib/types/project"
+import { AppImage } from "./ui/app-image"
+
+export function ProjectsSection({ initialProjects }: { initialProjects?: Project[] }) {
   const [currentSlide, setCurrentSlide] = useState(0)
   const sectionRef = useRef<HTMLDivElement>(null)
 
-  const { projects, isLoading } = useProjects(true, 6)
+  const { projects: swrProjects, isLoading } = useProjects(true, 6)
+  const projects = initialProjects && initialProjects.length ? initialProjects : swrProjects
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -31,14 +35,14 @@ export function ProjectsSection() {
   }, [])
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 2) % projects.length)
+    setCurrentSlide((prev) => (projects.length ? (prev + 2) % projects.length : 0))
   }
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 2 + projects.length) % projects.length)
+    setCurrentSlide((prev) => (projects.length ? (prev - 2 + projects.length) % projects.length : 0))
   }
 
-  if (isLoading) {
+  if (isLoading && (!projects || projects.length === 0)) {
     return (
       <section id="top-selling" className="py-24 bg-muted/30">
         <div className="container mx-auto px-4 lg:px-8">
@@ -67,8 +71,8 @@ export function ProjectsSection() {
               {projects.slice(currentSlide, currentSlide + 2).map((project, index) => (
                 <div key={project.id} className="transition-opacity duration-500">
                   <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-primary/10 mb-4">
-                    <Image
-                      src={project.image_url || "/placeholder.svg"}
+                    <AppImage
+                      src={project.image_url}
                       alt={project.title}
                       fill
                       className="object-cover hover:scale-105 transition-transform duration-500"

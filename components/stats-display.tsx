@@ -2,19 +2,18 @@
 
 import { useEffect, useState } from "react"
 import { StatCard } from "@/components/stat-card"
+import type { Stats } from "@/lib/types/stats"
 
-interface Stats {
-  total_products: number
-  completed_projects: number
-  customer_reviews: number
-  years_experience: number
-}
-
-export function StatsDisplay() {
-  const [stats, setStats] = useState<Stats | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+export function StatsDisplay({ initialStats }: { initialStats?: Stats | null }) {
+  const [stats, setStats] = useState<Stats | null>(initialStats ?? null)
+  const [isLoading, setIsLoading] = useState(!initialStats)
 
   useEffect(() => {
+    if (initialStats) {
+      setIsLoading(false)
+      return
+    }
+
     async function fetchStats() {
       try {
         const response = await fetch("/api/stats")
@@ -28,7 +27,7 @@ export function StatsDisplay() {
     }
 
     fetchStats()
-  }, [])
+  }, [initialStats])
 
   if (isLoading) {
     return null
