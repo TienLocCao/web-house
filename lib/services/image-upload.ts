@@ -6,7 +6,7 @@ export async function uploadImage(
   fd.append("image", file)
   if (oldImageUrl) fd.append("old_image_url", oldImageUrl)
 
-  const res = await fetch("/api/admin/products/upload", {
+  const res = await fetch("/api/admin/uploads", {
     method: "POST",
     body: fd,
   })

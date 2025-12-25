@@ -1,5 +1,5 @@
 import { sql } from "@/lib/db"
-import { buildPagination, buildOrderBy, buildWhere } from "@/lib/db/query"
+import query from "@/lib/db/query"
 import type { Product } from "@/lib/types/product"
 import type { PaginatedResult } from "@/lib/types/pagination"
 
@@ -14,9 +14,9 @@ export async function getProducts({
   sort?: any[]
   filter?: any
 }): Promise<PaginatedResult<Product>> {
-  const { where, values } = buildWhere(filter)
-  const orderBy = buildOrderBy(sort)
-  const { offset } = buildPagination(page, limit)
+  const { where, values } = query.buildWhere(filter, { alias: "p" })
+  const orderBy = query.buildOrderBy(sort, { alias: "p", categoryAlias: "c" })
+  const { offset } = query.buildPagination(page, limit)
 
   // ===== DATA QUERY =====
   const items = (await sql`

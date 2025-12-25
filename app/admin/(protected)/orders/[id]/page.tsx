@@ -1,9 +1,9 @@
 import type { Metadata } from "next"
-import { sql } from "@/lib/db"
 import { notFound } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ArrowLeft, Package, User, MapPin, CreditCard } from "lucide-react"
+import { getOrderById, getOrderItems } from "@/lib/services/orders"
 
 export const metadata: Metadata = {
   title: "Order Details | Admin",
@@ -15,20 +15,13 @@ export const dynamic = "force-dynamic"
 export default async function AdminOrderDetailPage({ params }: { params: { id: string } }) {
   const orderId = Number.parseInt(params.id)
 
-  const [order] = await sql
-    `
-    SELECT * FROM orders WHERE id = ${orderId}
-  `
+  const order = await getOrderById(orderId)
 
-  if (!order) {
-    notFound()
-  }
+  if (!order) notFound()
 
-  const orderItems = await sql`
-    SELECT * FROM order_items WHERE order_id = ${orderId}
-  `
+  const orderItems = await getOrderItems(orderId)
 
-  const shippingAddress = JSON.parse(order.shipping_address as string)
+  const shippingAddress = order.shipping_address
 
   const statusColors: Record<string, string> = {
     pending: "bg-yellow-100 text-yellow-800",

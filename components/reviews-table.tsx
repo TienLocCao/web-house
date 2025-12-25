@@ -5,20 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Check, Trash2, Star } from "lucide-react"
 import { useRouter } from "next/navigation"
 import type { Review } from "@/lib/types/review"
-
-// interface Review {
-//   id: number
-//   product_name: string
-//   product_slug: string
-//   customer_name: string
-//   email: string
-//   rating: number
-//   title: string | null
-//   comment: string | null
-//   is_verified: boolean
-//   is_approved: boolean
-//   created_at: string
-// }
+import { useToast } from "@/hooks/use-toast"
 
 interface ReviewsTableProps {
   reviews: Review[]
@@ -28,47 +15,45 @@ export function ReviewsTable({ reviews }: ReviewsTableProps) {
   const router = useRouter()
   const [updating, setUpdating] = useState<number | null>(null)
 
+  const { toast } = useToast()
+
   const handleApprove = async (reviewId: number) => {
     setUpdating(reviewId)
 
     try {
-      const response = await fetch(`/api/admin/reviews/${reviewId}/approve`, {
-        method: "PATCH",
-      })
-
+      const response = await fetch(`/api/admin/reviews/${reviewId}/approve`, { method: "PATCH" })
       if (response.ok) {
+        toast({ title: "Review approved", type: "success" })
         router.refresh()
       } else {
-        alert("Failed to approve review")
+        const json = await response.json().catch(() => null)
+        toast({ title: json?.error || "Failed to approve review", type: "error" })
       }
     } catch (error) {
-      console.error("Approve error:", error)
-      alert("An error occurred")
+      console.error(error)
+      toast({ title: "An error occurred", type: "error" })
     } finally {
       setUpdating(null)
     }
   }
 
   const handleReject = async (reviewId: number) => {
-    if (!confirm("Are you sure you want to reject this review?")) {
-      return
-    }
+    if (!confirm("Are you sure you want to reject this review?")) return
 
     setUpdating(reviewId)
 
     try {
-      const response = await fetch(`/api/admin/reviews/${reviewId}`, {
-        method: "DELETE",
-      })
-
+      const response = await fetch(`/api/admin/reviews/${reviewId}`, { method: "DELETE" })
       if (response.ok) {
+        toast({ title: "Review deleted", type: "success" })
         router.refresh()
       } else {
-        alert("Failed to delete review")
+        const json = await response.json().catch(() => null)
+        toast({ title: json?.error || "Failed to delete review", type: "error" })
       }
     } catch (error) {
-      console.error("Delete error:", error)
-      alert("An error occurred")
+      console.error(error)
+      toast({ title: "An error occurred", type: "error" })
     } finally {
       setUpdating(null)
     }

@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Mail, Phone, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
 import type { Contact } from "@/lib/types/contacts"
 
 interface ContactsTableProps {
@@ -20,6 +21,7 @@ const statusColors: Record<string, string> = {
 export function ContactsTable({ contacts }: ContactsTableProps) {
   const router = useRouter()
   const [updating, setUpdating] = useState<number | null>(null)
+  const { toast } = useToast()
 
   const handleStatusChange = async (contactId: number, newStatus: string) => {
     setUpdating(contactId)
@@ -32,36 +34,40 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
       })
 
       if (response.ok) {
+        toast({ title: "Status updated", type: "success" })
         router.refresh()
       } else {
-        alert("Failed to update status")
+        const json = await response.json().catch(() => null)
+        toast({ title: json?.error || "Failed to update status", type: "error" })
       }
     } catch (error) {
       console.error("Status update error:", error)
-      alert("An error occurred")
+      toast({ title: "An error occurred", type: "error" })
     } finally {
       setUpdating(null)
     }
   }
 
   const handleDelete = async (contactId: number) => {
-    if (!confirm("Are you sure you want to delete this inquiry?")) {
-      return
-    }
+    if (!confirm("Are you sure you want to delete this inquiry?")) return
+
+    setUpdating(contactId)
 
     try {
-      const response = await fetch(`/api/admin/contacts/${contactId}`, {
-        method: "DELETE",
-      })
+      const response = await fetch(`/api/admin/contacts/${contactId}`, { method: "DELETE" })
 
       if (response.ok) {
+        toast({ title: "Inquiry deleted", type: "success" })
         router.refresh()
       } else {
-        alert("Failed to delete inquiry")
+        const json = await response.json().catch(() => null)
+        toast({ title: json?.error || "Failed to delete inquiry", type: "error" })
       }
     } catch (error) {
       console.error("Delete error:", error)
-      alert("An error occurred")
+      toast({ title: "An error occurred", type: "error" })
+    } finally {
+      setUpdating(null)
     }
   }
 

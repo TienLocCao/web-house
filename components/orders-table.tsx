@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Eye } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
 import type { Order } from "@/lib/types/orders"
 
 
@@ -23,6 +24,7 @@ const statusColors: Record<string, string> = {
 export function OrdersTable({ orders }: OrdersTableProps) {
   const router = useRouter()
   const [updating, setUpdating] = useState<number | null>(null)
+  const { toast } = useToast()
 
   const handleStatusChange = async (orderId: number, newStatus: string) => {
     setUpdating(orderId)
@@ -35,13 +37,15 @@ export function OrdersTable({ orders }: OrdersTableProps) {
       })
 
       if (response.ok) {
+        toast({ title: "Status updated", type: "success" })
         router.refresh()
       } else {
-        alert("Failed to update order status")
+        const json = await response.json().catch(() => null)
+        toast({ title: json?.error || "Failed to update order status", type: "error" })
       }
     } catch (error) {
       console.error("Status update error:", error)
-      alert("An error occurred")
+      toast({ title: "An error occurred", type: "error" })
     } finally {
       setUpdating(null)
     }
