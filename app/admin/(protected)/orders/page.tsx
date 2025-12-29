@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { sql } from "@/lib/db"
-import { OrdersTable } from "@/components/orders-table"
+import { OrdersTable } from "@/components/OrdersTable"
 import { getOrders } from "@/lib/services/orders"
 
 export const metadata: Metadata = {

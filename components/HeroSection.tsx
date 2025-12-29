@@ -1,35 +1,19 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useRef } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { StatsDisplay } from "@/components/stats-display"
+import { StatsDisplay } from "@/components/StatsDisplay"
 import type { Stats } from "@/lib/types/stats"
 import { AppImage } from "@/components/ui/app-image"
+import { useAnimateOnInView } from "@/hooks/useAnimateOnInView"
 type HeroSectionProps = {
   initialStats: Stats
 }
 
 export function HeroSection({ initialStats }: HeroSectionProps) {
   const sectionRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("animate-fade-in-up")
-          }
-        })
-      },
-      { threshold: 0.1 },
-    )
-
-    const elements = sectionRef.current?.querySelectorAll(".observe-animate")
-    elements?.forEach((el) => observer.observe(el))
-
-    return () => observer.disconnect()
-  }, [])
+  useAnimateOnInView(sectionRef, { threshold: 0.1 })
 
   return (
     <section id="home" ref={sectionRef} className="pt-32 pb-16 lg:pt-40 lg:pb-24">
@@ -58,7 +42,7 @@ export function HeroSection({ initialStats }: HeroSectionProps) {
           <div className="relative observe-animate opacity-0" style={{ animationDelay: "0.2s" }}>
             <div className="relative aspect-square lg:aspect-[4/5] rounded-2xl overflow-hidden bg-muted">
               <AppImage
-                src="/modern-black-chair-with-wooden-legs.jpg"
+                src="/uploads/home/modern-black-chair-with-wooden-legs.jpg"
                 alt="Modern Black Chair"
                 fill
                 className="object-cover"
@@ -69,7 +53,7 @@ export function HeroSection({ initialStats }: HeroSectionProps) {
             {/* Floating Cards */}
             <div className="absolute top-4 right-4 bg-card/95 backdrop-blur-sm p-4 rounded-xl shadow-lg max-w-[200px]">
               <AppImage
-                src="/cozy-living-room.png"
+                src="/uploads/home/cozy-living-room.png"
                 alt="Room Preview"
                 width={200}
                 height={120}

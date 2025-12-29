@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/useToast"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import CategoryCreateEditDialog from "@/components/admin/categories/createEditDialog"

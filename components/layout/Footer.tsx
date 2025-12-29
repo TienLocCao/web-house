@@ -7,7 +7,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/useToast"
 
 export function Footer() {
   const { toast } = useToast()
@@ -49,7 +49,7 @@ export function Footer() {
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to subscribe",
-        variant: "destructive",
+        type: "error",
       })
     } finally {
       setIsSubmittingNewsletter(false)
@@ -82,7 +82,7 @@ export function Footer() {
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to send message",
-        variant: "destructive",
+        type: "error",
       })
     } finally {
       setIsSubmittingContact(false)

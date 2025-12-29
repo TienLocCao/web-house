@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 import { sql } from "@/lib/db"
-import { DashboardStats } from "@/components/dashboard-stats"
-import { RecentOrders } from "@/components/recent-orders"
-import { RecentReviews } from "@/components/recent-reviews"
+import { DashboardStats } from "@/components/DashboardStats"
+import { RecentOrders } from "@/components/RecentOrders"
+import { RecentReviews } from "@/components/RecentReviews"
 
 export const metadata: Metadata = {
   title: "Dashboard | Admin",

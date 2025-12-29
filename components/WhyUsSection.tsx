@@ -1,29 +1,13 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { AppImage } from "./ui/app-image"
+import { useAnimateOnInView } from "@/hooks/useAnimateOnInView"
 
 export function WhyUsSection() {
   const sectionRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("animate-fade-in-up")
-          }
-        })
-      },
-      { threshold: 0.1 },
-    )
-
-    const elements = sectionRef.current?.querySelectorAll(".observe-animate")
-    elements?.forEach((el) => observer.observe(el))
-
-    return () => observer.disconnect()
-  }, [])
+  useAnimateOnInView(sectionRef, { threshold: 0.1 })
 
   return (
     <section ref={sectionRef} className="py-24 bg-muted/30">
@@ -55,7 +39,7 @@ export function WhyUsSection() {
           {/* Right Content - Image */}
           <div className="relative observe-animate opacity-0" style={{ animationDelay: "0.2s" }}>
             <div className="relative aspect-[4/5] rounded-2xl overflow-hidden">
-              <AppImage src="/elegant-dining-room-with-wooden-chair.jpg" alt="Dining Room Chair" fill className="object-cover" />
+              <AppImage src="/uploads/home/elegant-dining-room-with-wooden-chair.jpg" alt="Dining Room Chair" fill className="object-cover" />
             </div>
           </div>
         </div>

@@ -6,10 +6,21 @@ import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 
-function Select({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Root>) {
-  return <SelectPrimitive.Root data-slot="select" {...props} />
+type SelectProps =
+  React.ComponentProps<typeof SelectPrimitive.Root> & {
+    className?: string
+  }
+
+function Select(
+  { className, children, ...props }: SelectProps
+) {
+  return (
+    <SelectPrimitive.Root {...props}>
+      <SelectPrimitive.Trigger className={className}>
+        {children}
+      </SelectPrimitive.Trigger>
+    </SelectPrimitive.Root>
+  )
 }
 
 function SelectGroup({

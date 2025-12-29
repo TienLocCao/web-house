@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/useToast"
 import {
   Dialog,
   DialogContent,
@@ -13,11 +13,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/select"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/Select"
 import { ImageUploader } from "@/components/admin/products/ImageUploader"
 import GalleryUploader from "@/components/admin/projects/GalleryUploader"
-import { uploadImage, deleteImage } from "@/lib/services/image-upload"
-import { useRoomTypes } from "@/hooks/use-room-types"
+import { uploadImage, deleteImage } from "@/lib/services/imageUpload"
+import { useRoomTypes } from "@/hooks/useRoomTypes"
 
 type GalleryItem = {
   id: string

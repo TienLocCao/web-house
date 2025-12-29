@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/useToast"
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { FieldError } from "@/components/ui/field"
 import { ImageUploader } from "@/components/admin/products/ImageUploader"
-import { uploadImage, deleteImage } from "@/lib/services/image-upload"
+import { uploadImage, deleteImage } from "@/lib/services/imageUpload"
 
 type FormState = { name: string; slug: string; description: string; image_url?: string }
 

@@ -1,6 +1,6 @@
 import type { Project } from "@/lib/types/project"
 import { getProjects } from "@/lib/services/projects"
-import ProjectsCarousel from "./projects-carousel"
+import ProjectsCarousel from "./ProjectsCarousel"
 
 export default async function ProjectsSection({ initialProjects }: { initialProjects?: Project[] }) {
   const data = initialProjects && initialProjects.length ? initialProjects : (await getProjects({ limit: 6 })).items
