@@ -1,9 +1,9 @@
-import { Header } from "@/components/Header"
+import { Header } from "@/components/layout/Header"
 import { HeroSection } from "@/components/HeroSection"
 import { WhyUsSection } from "@/components/WhyUsSection"
 import { ShopByRoom } from "@/components/ShopByRoom"
 import { ProjectsSection } from "@/components/ProjectsSection"
-import { Footer } from "@/components/Footer"
+import { Footer } from "@/components/layout/Footer"
 
 import { getProducts } from "@/lib/services/products"
 import { getProjects } from "@/lib/services/projects"

@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation"
 import { useState } from "react"
 import { Header } from "@/components/Header2"
-import { Footer } from "@/components/Footer"
+import { Footer } from "@/components/layout/Footer"
 import { ProductCard } from "@/components/ProductCard"
 import { useProducts } from "@/lib/useProducts"
 import { Button } from "@/components/ui/button"
