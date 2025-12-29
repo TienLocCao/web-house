@@ -49,7 +49,7 @@ export function Footer() {
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to subscribe",
-        variant: "destructive",
+        type: "error",
       })
     } finally {
       setIsSubmittingNewsletter(false)
@@ -82,7 +82,7 @@ export function Footer() {
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to send message",
-        variant: "destructive",
+        type: "error",
       })
     } finally {
       setIsSubmittingContact(false)
