@@ -1,17 +1,17 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/useToast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { FieldError } from "@/components/ui/field"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/select"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/Select2"
 import { ImageUploader } from "@/components/admin/products/ImageUploader"
-import { uploadImage } from "@/lib/services/image-upload"
-import { useRoomTypes } from "@/hooks/use-room-types"
+import { uploadImage } from "@/lib/services/imageUpload"
+import { useRoomTypes } from "@/hooks/useRoomTypes"
 
 type FormState = {
   title: string

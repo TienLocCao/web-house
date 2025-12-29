@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useProjects } from "@/lib/use-projects"
+import { useProjects } from "@/lib/useProjects"
+import { useAnimateOnInView } from "@/hooks/useAnimateOnInView"
 
 import type { Project } from "@/lib/types/project"
 import { AppImage } from "./ui/app-image"
@@ -16,23 +17,7 @@ export function ProjectsSection({ initialProjects }: { initialProjects?: Project
   const { projects: swrProjects, isLoading } = useProjects(true, 6)
   const projects = initialProjects && initialProjects.length ? initialProjects : swrProjects
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("animate-fade-in-up")
-          }
-        })
-      },
-      { threshold: 0.1 },
-    )
-
-    const elements = sectionRef.current?.querySelectorAll(".observe-animate")
-    elements?.forEach((el) => observer.observe(el))
-
-    return () => observer.disconnect()
-  }, [])
+  useAnimateOnInView(sectionRef, { threshold: 0.1 })
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (projects.length ? (prev + 2) % projects.length : 0))

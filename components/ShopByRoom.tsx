@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect, useRef } from "react"
-import { RoomCard } from "@/components/room-card"
-import { useProducts } from "@/lib/use-products"
+import { useRef } from "react"
+import { RoomCard } from "@/components/RoomCard"
+import { useProducts } from "@/lib/useProducts"
 import type { Product } from "@/lib/types/product"
+import { useAnimateOnInView } from "@/hooks/useAnimateOnInView"
 
 export function ShopByRoom({ initialProductsByRoom }: { initialProductsByRoom?: { living_room?: Product[]; dining_room?: Product[]; bedroom?: Product[] } }) {
   const sectionRef = useRef<HTMLDivElement>(null)
@@ -13,23 +14,7 @@ export function ShopByRoom({ initialProductsByRoom }: { initialProductsByRoom?: 
   const { products: bedroomProducts } = useProducts({ room_type: "bedroom", limit: 1 })
 
   console.log("Living Room Products:", livingRoomProducts)
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("animate-fade-in-up")
-          }
-        })
-      },
-      { threshold: 0.1 },
-    )
-
-    const elements = sectionRef.current?.querySelectorAll(".observe-animate")
-    elements?.forEach((el) => observer.observe(el))
-
-    return () => observer.disconnect()
-  }, [])
+  useAnimateOnInView(sectionRef, { threshold: 0.1 })
 
   const rooms = [
     {

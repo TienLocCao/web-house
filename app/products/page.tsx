@@ -2,10 +2,10 @@
 
 import { useSearchParams } from "next/navigation"
 import { useState } from "react"
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { ProductCard } from "@/components/product-card"
-import { useProducts } from "@/lib/use-products"
+import { Header } from "@/components/Header2"
+import { Footer } from "@/components/Footer2"
+import { ProductCard } from "@/components/ProductCard"
+import { useProducts } from "@/lib/useProducts"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 

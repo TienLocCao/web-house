@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useToast } from "@/hooks/use-toast"
-import { useRoomTypes } from "@/hooks/use-room-types"
+import { useToast } from "@/hooks/useToast"
+import { useRoomTypes } from "@/hooks/useRoomTypes"
 import {
   Dialog,
   DialogTrigger,
@@ -24,9 +24,9 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/select"
+} from "@/components/Select2"
 import { ImageUploader } from "@/components/admin/products/ImageUploader"
-import { uploadImage } from "@/lib/services/image-upload"
+import { uploadImage } from "@/lib/services/imageUpload"
 
 type ProductFormState = {
   name: string

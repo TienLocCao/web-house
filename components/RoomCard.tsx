@@ -1,7 +1,9 @@
 "use client"
 
 import Link from "next/link"
+import { useRef } from "react"
 import { AppImage } from "@/components/ui/app-image"
+import { useAnimateOnInView } from "@/hooks/useAnimateOnInView"
 interface RoomCardProps {
   title: string
   description?: string | null
@@ -11,9 +13,12 @@ interface RoomCardProps {
 }
 
 export function RoomCard({ title, description, imageUrl, href, delay }: RoomCardProps) {
+  const cardRef = useRef<HTMLDivElement | null>(null)
+  useAnimateOnInView(cardRef, { threshold: 0.1 })
   return (
     <Link href={href}>
       <div
+        ref={cardRef}
         className="group observe-animate hover:scale-[1.02] transition-transform duration-300"
         style={{ animationDelay: delay }}
       >

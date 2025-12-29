@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Check, Trash2, Star } from "lucide-react"
 import { useRouter } from "next/navigation"
 import type { Review } from "@/lib/types/review"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/useToast"
 
 interface ReviewsTableProps {
   reviews: Review[]

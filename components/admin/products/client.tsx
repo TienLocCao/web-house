@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/useToast"
 import { Button } from "@/components/ui/button"
 import { Plus, Edit, Trash } from "lucide-react"
 import ProductCreateEditDialog from "@/components/admin/products/createEditDialog"

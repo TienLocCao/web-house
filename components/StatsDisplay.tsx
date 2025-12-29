@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { StatCard } from "@/components/stat-card"
+import { StatCard } from "@/components/StatCard"
 import type { Stats } from "@/lib/types/stats"
 
 export function StatsDisplay({ initialStats }: { initialStats?: Stats | null }) {
