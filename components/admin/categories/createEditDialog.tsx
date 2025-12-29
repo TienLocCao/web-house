@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useToast } from "@/hooks/useToast"
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { FieldError } from "@/components/ui/field"
 import { ImageUploader } from "@/components/admin/products/ImageUploader"
-import { uploadImage } from "@/lib/services/imageUpload"
+import { uploadImage, deleteImage } from "@/lib/services/imageUpload"
 
 type FormState = { name: string; slug: string; description: string; image_url?: string }
 
@@ -22,11 +22,15 @@ export default function CategoryCreateEditDialog({ mode = "create", category = n
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState("")
   const [saving, setSaving] = useState(false)
+  const newlyUploadedRef = useRef<string[]>([])
+  const initialImageRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (category) {
       setForm({ name: category.name ?? "", slug: category.slug ?? "", description: category.description ?? "" })
       setPreviewUrl(category.image_url ?? "")
+      initialImageRef.current = category.image_url ?? null
+      newlyUploadedRef.current = []
     } else {
       setForm(EMPTY)
       setPreviewUrl("")
@@ -61,6 +65,7 @@ export default function CategoryCreateEditDialog({ mode = "create", category = n
       let finalUrl = form.image_url
       if (imageFile) {
         finalUrl = await uploadImage(imageFile, form.image_url)
+        newlyUploadedRef.current.push(finalUrl)
         setForm((p) => ({ ...p, image_url: finalUrl }))
         setPreviewUrl(finalUrl)
       }
@@ -70,6 +75,9 @@ export default function CategoryCreateEditDialog({ mode = "create", category = n
       const { res, json } = await submit(payload)
 
       if (!res.ok) {
+        if (newlyUploadedRef.current.length) {
+          await Promise.allSettled(newlyUploadedRef.current.map((u) => deleteImage(u)))
+        }
         if (Array.isArray(json?.errors)) {
           const errs: Record<string, string[]> = {}
           json.errors.forEach((e: any) => { const key = e.path || "_form"; errs[key] = errs[key] || []; errs[key].push(e.message) })
@@ -85,6 +93,9 @@ export default function CategoryCreateEditDialog({ mode = "create", category = n
       onOpenChange(false)
       onSaved?.()
     } catch (err: any) {
+      if (newlyUploadedRef.current.length) {
+        await Promise.allSettled(newlyUploadedRef.current.map((u) => deleteImage(u)))
+      }
       toast({ title: err.message || "Something went wrong", type: "error" })
     } finally {
       setSaving(false)

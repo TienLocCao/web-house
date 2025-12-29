@@ -2,13 +2,13 @@
 
 import { useParams } from "next/navigation"
 import Image from "next/image"
-import { Header } from "@/components/Header2"
+import { Header } from "@/components/layout/Header"
 import { Footer } from "@/components/layout/Footer"
 import { ProductCard } from "@/components/ProductCard"
 import { useProduct } from "@/lib/useProducts"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+import { Separator } from "@/components/ui/Separator"
 
 export default function ProductDetailPage() {
   const params = useParams()

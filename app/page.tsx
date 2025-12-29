@@ -2,12 +2,15 @@ import { Header } from "@/components/layout/Header"
 import { HeroSection } from "@/components/HeroSection"
 import { WhyUsSection } from "@/components/WhyUsSection"
 import { ShopByRoom } from "@/components/ShopByRoom"
-import { ProjectsSection } from "@/components/ProjectsSection"
+import ProjectsSection from "@/components/ProjectsSection"
 import { Footer } from "@/components/layout/Footer"
 
 import { getProducts } from "@/lib/services/products"
 import { getProjects } from "@/lib/services/projects"
 import { sql } from "@/lib/db"
+import type { Product } from "@/lib/types/product"
+
+export const revalidate = 60
 
 export default async function HomePage() {
   // Fetch small datasets server-side to hydrate client components
@@ -20,7 +23,7 @@ export default async function HomePage() {
     sql`SELECT COUNT(*)::int AS count FROM orders`,
   ])
 
-  const initialProducts = productsResult.items || []
+  const initialProducts: Product[] = productsResult.items || []
   const initialProjects = projectsResult.items || []
 
   const stats = {
@@ -37,11 +40,13 @@ export default async function HomePage() {
       <Header />
       <HeroSection initialStats={stats} />
       <WhyUsSection />
-      <ShopByRoom initialProductsByRoom={{
-        living_room: initialProducts.filter((p: any) => p.room_type === "living_room"),
-        dining_room: initialProducts.filter((p: any) => p.room_type === "dining_room"),
-        bedroom: initialProducts.filter((p: any) => p.room_type === "bedroom"),
-      }} />
+      <ShopByRoom
+        initialProductsByRoom={{
+          living_room: initialProducts.filter((p: Product) => p.room_type === "living_room"),
+          dining_room: initialProducts.filter((p: Product) => p.room_type === "dining_room"),
+          bedroom: initialProducts.filter((p: Product) => p.room_type === "bedroom"),
+        }}
+      />
       <ProjectsSection initialProjects={initialProjects} />
       <Footer />
     </main>

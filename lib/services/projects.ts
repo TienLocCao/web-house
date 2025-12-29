@@ -23,3 +23,65 @@ export async function getProjects({ page = 1, limit = 5, sort = [], filter = {} 
 
   return { items, total: count, page, limit }
 }
+
+
+/**
+ * Chuẩn hóa payload trước khi gửi API
+ */
+function normalizeProjectPayload(project: Project) {
+  return {
+    ...project,
+    budget:
+      project.budget === "" || project.budget == null
+        ? null
+        : Number(project.budget),
+
+    gallery: Array.isArray(project.gallery)
+      ? project.gallery.map((g: any) =>
+          typeof g === "string" ? g : g.url
+        )
+      : [],
+  }
+}
+
+/**
+ * Create project
+ */
+export async function createProject(project: Project) {
+  const payload = normalizeProjectPayload(project)
+
+  const res = await fetch("/api/admin/projects", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!res.ok) {
+    throw new Error("Create project failed")
+  }
+
+  return res.json()
+}
+
+/**
+ * Update project
+ */
+export async function updateProject(id: string, project: Project) {
+  const payload = normalizeProjectPayload(project)
+
+  const res = await fetch(`/api/admin/projects/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!res.ok) {
+    throw new Error("Update project failed")
+  }
+
+  return res.json()
+}

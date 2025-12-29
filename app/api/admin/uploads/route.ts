@@ -36,3 +36,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Upload failed" }, { status: 500 })
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  await requireAuth()
+
+  try {
+    const json = await request.json()
+    const imageUrl = typeof json?.image_url === "string" ? json.image_url : undefined
+    if (!imageUrl) return NextResponse.json({ message: "image_url required" }, { status: 400 })
+
+    await deleteImageByUrl(imageUrl)
+
+    return NextResponse.json({ ok: true })
+  } catch (err) {
+    console.error("Delete upload failed", err)
+    return NextResponse.json({ message: "Delete failed" }, { status: 500 })
+  }
+}
