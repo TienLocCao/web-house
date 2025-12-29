@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { useRoomTypes } from "@/hooks/use-room-types"
 import {
@@ -26,7 +26,7 @@ import {
   SelectItem,
 } from "@/components/select"
 import { ImageUploader } from "@/components/admin/products/ImageUploader"
-import { uploadImage } from "@/lib/services/image-upload"
+import { uploadImage, deleteImage } from "@/lib/services/image-upload"
 
 type ProductFormState = {
   name: string
@@ -93,6 +93,8 @@ export default function ProductCreateEditDialog({
 
   // ===== ui =====
   const [saving, setSaving] = useState(false)
+  const newlyUploadedRef = useRef<string[]>([])
+  const initialImageRef = useRef<string | null>(null)
 
   // ===== init =====
   useEffect(() => {
@@ -110,6 +112,8 @@ export default function ProductCreateEditDialog({
         description: product.description ?? "",
       })
       setPreviewUrl(product.image_url ?? "")
+      initialImageRef.current = product.image_url ?? null
+      newlyUploadedRef.current = []
     } else {
       setForm(EMPTY_FORM)
       setPreviewUrl("")
@@ -193,6 +197,7 @@ export default function ProductCreateEditDialog({
 
       if (imageFile) {
         finalImageUrl = await uploadImage(imageFile, form.image_url)
+        newlyUploadedRef.current.push(finalImageUrl)
         setForm((prev) => ({ ...prev, image_url: finalImageUrl }))
         setPreviewUrl(finalImageUrl)
       }
@@ -201,6 +206,9 @@ export default function ProductCreateEditDialog({
       const { res, json } = await submitProduct(payload)
 
       if (!res.ok) {
+        if (newlyUploadedRef.current.length) {
+          await Promise.allSettled(newlyUploadedRef.current.map((u) => deleteImage(u)))
+        }
         if (Array.isArray(json?.errors)) {
           applyFieldErrors(json.errors)
           json.errors.forEach((e: any) =>
@@ -220,6 +228,9 @@ export default function ProductCreateEditDialog({
       onOpenChange(false)
       onSaved?.()
     } catch (err: any) {
+      if (newlyUploadedRef.current.length) {
+        await Promise.allSettled(newlyUploadedRef.current.map((u) => deleteImage(u)))
+      }
       toast({ title: err.message || "Something went wrong", type: "error" })
     } finally {
       setSaving(false)
@@ -242,7 +253,7 @@ export default function ProductCreateEditDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-4">
             <div>
               <Label>Name</Label>
               <Input

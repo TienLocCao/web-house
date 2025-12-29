@@ -1,17 +1,40 @@
+// lib/types/project.ts
+
+export type ProjectStatus = "completed" | "ongoing" | "draft"
+
+/**
+ * Item trong gallery
+ * upload xong → chỉ cần url
+ */
+export interface GalleryItem {
+  id: string
+  url: string
+  status?: "uploading" | "done" | "error"
+}
+
+/**
+ * Project form + API payload
+ * NOTE:
+ * - budget để string (form) → convert number khi save DB
+ */
 export interface Project {
-  id: number
+  id?: string
+
   title: string
   slug: string
-  description?: string | null
-  client_name?: string | null
-  location?: string | null
+  description?: string
+
+  client_name?: string
+  location?: string
+
   image_url: string
-  gallery?: string[]
-  room_type?: string | null
-  status?: string
-  completion_date?: string | null
-  budget?: number | null
-  featured?: boolean
-  created_at?: string
-  updated_at?: string
+  gallery?: string[] | GalleryItem[]
+
+  room_type?: string
+  status?: ProjectStatus
+
+  completion_date?: string
+  budget?: string | number
+
+  featured: boolean
 }
