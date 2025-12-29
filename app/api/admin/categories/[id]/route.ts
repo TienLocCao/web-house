@@ -10,11 +10,11 @@ export const runtime = "nodejs"
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     await requireAuth()
-    const { id } = params
+    const { id } = await params
     const categoryId = Number(id)
     const body = await request.json()
     const validated = CategoryUpdateSchema.parse(body)
-
+   
     if (validated.slug) {
       const [conflict] = await sql`SELECT id FROM categories WHERE slug = ${validated.slug} AND id != ${categoryId}`
       if (conflict) {
@@ -45,7 +45,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
   await requireAuth()
-  const { id } = params
+  const { id } = await params
   const categoryId = Number(id)
 
   const [category] = await sql`SELECT image_url FROM categories WHERE id = ${categoryId}`

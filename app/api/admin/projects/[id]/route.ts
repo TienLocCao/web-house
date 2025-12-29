@@ -10,7 +10,7 @@ export const runtime = "nodejs"
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     await requireAuth()
-    const { id } = params
+    const { id } = await params
     const projectId = Number(id)
     const body = await request.json()
     const validated = ProjectUpdateSchema.parse(body)
@@ -51,7 +51,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
   await requireAuth()
-  const { id } = params
+  const { id } = await params
   const projectId = Number(id)
 
   const [project] = await sql`SELECT image_url, gallery FROM projects WHERE id = ${projectId}`

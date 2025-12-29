@@ -16,3 +16,13 @@ export async function uploadImage(
 
   return json.image_url
 }
+
+export async function deleteImage(imageUrl: string): Promise<void> {
+  if (!imageUrl) return
+
+  await fetch("/api/admin/uploads", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ image_url: imageUrl }),
+  })
+}
