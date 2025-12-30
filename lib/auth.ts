@@ -119,6 +119,42 @@ export async function destroySession(): Promise<void> {
 }
 
 /**
+ * Refresh current session expiry (extend session)
+ * Returns true if refreshed, false otherwise
+ */
+export async function refreshSession(): Promise<boolean> {
+  try {
+    const cookieStore = await cookies()
+    const sessionToken = cookieStore.get("admin_session")?.value
+
+    if (!sessionToken) return false
+
+    const [session] = await sql`
+      SELECT * FROM admin_sessions WHERE session_token = ${sessionToken} AND expires_at > NOW()
+    `
+
+    if (!session) return false
+
+    const expiresAt = new Date(Date.now() + SESSION_DURATION)
+    await sql`UPDATE admin_sessions SET expires_at = ${expiresAt} WHERE id = ${session.id}`
+
+    const isProd = process.env.NODE_ENV === "production"
+    cookieStore.set("admin_session", sessionToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      expires: expiresAt,
+      path: "/",
+    })
+
+    return true
+  } catch (error) {
+    console.error("[v0] refreshSession error:", error)
+    return false
+  }
+}
+
+/**
  * Clean up expired sessions (call this periodically)
  */
 export async function cleanupExpiredSessions(): Promise<void> {
