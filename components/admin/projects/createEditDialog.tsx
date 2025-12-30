@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/Select"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { ImageUploader } from "@/components/admin/products/ImageUploader"
 import GalleryUploader from "@/components/admin/projects/GalleryUploader"
 import { uploadImage, deleteImage } from "@/lib/services/imageUpload"
@@ -248,7 +248,7 @@ export default function ProjectCreateEditDialog({
                 onValueChange={(v) => updateField("room_type", v)}
                 
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select room" />
                 </SelectTrigger>
                 <SelectContent>

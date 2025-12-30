@@ -8,7 +8,7 @@ import { ProductCard } from "@/components/ProductCard"
 import { useProduct } from "@/lib/useProducts"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/Separator"
+import { Separator } from "@/components/ui/separator"
 
 export default function ProductDetailPage() {
   const params = useParams()

@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation"
 import { useState } from "react"
-import { Header } from "@/components/Header2"
+import { Header } from "@/components/layout/Header"
 import { Footer } from "@/components/layout/Footer"
 import { ProductCard } from "@/components/ProductCard"
 import { useProducts } from "@/lib/useProducts"
@@ -19,8 +19,7 @@ export default function ProductsPage() {
   const { products, pagination, isLoading, isError } = useProducts({
     room_type: roomType,
     sort,
-    limit,
-    offset,
+    limit
   })
 
   if (isError) {
