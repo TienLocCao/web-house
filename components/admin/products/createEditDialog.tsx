@@ -24,7 +24,7 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/Select"
+} from "@/components/ui/select"
 import { ImageUploader } from "@/components/admin/products/ImageUploader"
 import { uploadImage, deleteImage } from "@/lib/services/imageUpload"
 
@@ -278,7 +278,7 @@ export default function ProductCreateEditDialog({
                 value={form.room_type}
                 onValueChange={(v) => updateField("room_type", v)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select room" />
                 </SelectTrigger>
                 <SelectContent>

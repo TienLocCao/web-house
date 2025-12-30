@@ -13,7 +13,6 @@ export function ShopByRoom({ initialProductsByRoom }: { initialProductsByRoom?: 
   const { products: diningRoomProducts } = useProducts({ room_type: "dining_room", limit: 1 })
   const { products: bedroomProducts } = useProducts({ room_type: "bedroom", limit: 1 })
 
-  console.log("Living Room Products:", livingRoomProducts)
   useAnimateOnInView(sectionRef, { threshold: 0.1 })
 
   const rooms = [
@@ -39,7 +38,6 @@ export function ShopByRoom({ initialProductsByRoom }: { initialProductsByRoom?: 
       href: "/products?room_type=bedroom",
     },
   ]
-  console.log("Rooms Data:", rooms)
 
   return (
     <section id="categories" ref={sectionRef} className="py-24">

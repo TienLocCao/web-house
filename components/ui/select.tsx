@@ -12,15 +12,9 @@ type SelectProps =
   }
 
 function Select(
-  { className, children, ...props }: SelectProps
+  props: React.ComponentProps<typeof SelectPrimitive.Root>
 ) {
-  return (
-    <SelectPrimitive.Root {...props}>
-      <SelectPrimitive.Trigger className={className}>
-        {children}
-      </SelectPrimitive.Trigger>
-    </SelectPrimitive.Root>
-  )
+  return <SelectPrimitive.Root {...props} />
 }
 
 function SelectGroup({

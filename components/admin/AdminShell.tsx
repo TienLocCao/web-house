@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { AdminSidebar } from "./admin-sidebar"
-import { AdminHeader } from "./admin-header"
+import { AdminSidebar } from "./AdminSidebar"
+import { AdminHeader } from "./AdminHeader"
+import SessionRefresher from "./SessionRefresher"
 
 export default function AdminShell({
   admin,
@@ -15,20 +16,6 @@ export default function AdminShell({
   const [isCollapsed, setIsCollapsed] = useState(false)
 
   return (
-    // <div className="min-h-screen bg-neutral-50">
-    //   <AdminSidebar
-    //     admin={admin}
-    //     activePage={activePage}
-    //     setActivePage={setActivePage}
-    //     isCollapsed={isCollapsed}
-    //     setIsCollapsed={setIsCollapsed}
-    //   />
-
-    //   <div className="lg:pl-64">
-    //     <AdminHeader admin={admin} isCollapsed={isCollapsed} />
-    //     <main className="p-6">{children}</main>
-    //   </div>
-    // </div>
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Sidebar */}
       <AdminSidebar
@@ -46,6 +33,7 @@ export default function AdminShell({
 
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <SessionRefresher />
       </div>
     </div>
     
