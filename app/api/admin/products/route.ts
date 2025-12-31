@@ -10,11 +10,21 @@ export const runtime = "edge"
 // GET /api/admin/products
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
-
   const page = Number(searchParams.get("page") ?? 1)
   const limit = Number(searchParams.get("limit") ?? 5)
-  const sort = JSON.parse(searchParams.get("sort") ?? "[]")
-  const result = await getProducts({ page, limit, sort })
+  let sort: any[] = []
+    try {
+      sort = JSON.parse(searchParams.get("sort") || "[]")
+    } catch {}
+
+  // support filtering
+  const search = searchParams.get("search") ?? undefined
+  const roomType = searchParams.get("room_type") ?? undefined
+  const filter: any = {}
+  if (search) filter.name = search
+  if (roomType) filter.room_type = roomType
+console.log("[admin/products.GET] page:", page, "limit:", limit, "sort:", sort, "filter:", filter)
+  const result = await getProducts({ page, limit, sort, filter })
   return NextResponse.json(result)
 }
 

@@ -1,32 +1,56 @@
+import { sql } from "@/lib/db"
+
 export function buildWhere(
   filter: Record<string, any>,
-  opts: { alias?: string; fieldMap?: Record<string, string> } = {}
+  opts: { alias?: string } = {}
 ) {
-  const conditions: string[] = []
-  const values: any[] = []
-
+  const conditions: any[] = []
   const prefix = opts.alias ? `${opts.alias}.` : ""
 
-  if (filter.name) {
-    values.push(`%${filter.name}%`)
-    const column = opts.fieldMap?.name ?? `${prefix}name`
-    conditions.push(`${column} ILIKE $${values.length}`)
+  if (typeof filter.name === "string") {
+    const v = filter.name.trim()
+    if (v !== "") {
+      conditions.push(
+        sql`${sql.unsafe(prefix + "name")} ILIKE ${"%" + v + "%"}`
+      )
+    }
+  }
+   if (filter.room_type != null && filter.room_type !== "all") {
+    conditions.push(
+      sql`${sql.unsafe(prefix + "room_type")} = ${filter.room_type}`
+    )
   }
 
-  if (filter.categoryId) {
-    values.push(filter.categoryId)
-    const column = opts.fieldMap?.categoryId ?? `${prefix}category_id`
-    conditions.push(`${column} = $${values.length}`)
+  if (filter.categoryId != null) {
+    conditions.push(
+      sql`${sql.unsafe(prefix + "category_id")} = ${filter.categoryId}`
+    )
   }
 
-  if (filter.isAvailable !== undefined) {
-    values.push(filter.isAvailable)
-    const column = opts.fieldMap?.isAvailable ?? `${prefix}is_available`
-    conditions.push(`${column} = $${values.length}`)
+  if (typeof filter.isAvailable === "boolean") {
+    conditions.push(
+      sql`${sql.unsafe(prefix + "is_available")} = ${filter.isAvailable}`
+    )
   }
 
-  return {
-    where: conditions.length ? `WHERE ${conditions.join(" AND ")}` : "",
-    values,
+  if (typeof filter.roomType === "string") {
+    const v = filter.roomType.trim()
+    if (v !== "") {
+      conditions.push(
+        sql`${sql.unsafe(prefix + "room_type")} = ${v}`
+      )
+    }
   }
+
+  if (conditions.length === 0) {
+    return sql``
+  }
+
+  // 🔥 Thay sql.join bằng reduce
+  return sql`
+    WHERE ${conditions.reduce(
+      (acc, cur) => (acc ? sql`${acc} AND ${cur}` : cur),
+      null as any
+    )}
+  `
 }
