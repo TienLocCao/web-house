@@ -1,6 +1,7 @@
 "use client"
 import useSWR from "swr"
 import type { Product } from "@/lib/db"
+import useSWRInfinite from "swr/infinite"
 
 interface ProductsResponse {
   data: Product[]
@@ -18,33 +19,63 @@ interface UseProductsOptions {
   is_featured?: boolean
   limit?: number
   sort?: string
+  query?: string
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
-
-export function useProducts(options: UseProductsOptions = {}) {
-  const params = new URLSearchParams()
-
-  if (options.room_type) params.append("room_type", options.room_type)
-  if (options.category) params.append("category", options.category)
-  if (options.is_featured) params.append("is_featured", "true")
-  if (options.limit) params.append("limit", options.limit.toString())
-  if (options.sort) params.append("sort", options.sort)
-
-  const { data, error, isLoading } = useSWR<ProductsResponse>(`/api/products?${params.toString()}`, fetcher, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-    dedupingInterval: 60000, // 1 minute
+const fetcher = (url: string) =>
+  fetch(url).then((res) => {
+    if (!res.ok) throw new Error("Failed to fetch")
+    return res.json()
   })
 
-  return {
-    products: data?.data || [],
-    pagination: data?.pagination,
+export function useProducts(options: UseProductsOptions = {}) {
+  const limit = options.limit ?? 12
+
+  const getKey = (pageIndex: number, previousPageData: ProductsResponse | null) => {
+    if (previousPageData && !previousPageData.pagination.hasMore) {
+      return null
+    }
+
+    const params = new URLSearchParams()
+
+    params.set("limit", limit.toString())
+    params.set("offset", (pageIndex * limit).toString())
+
+    if (options.room_type) params.set("room_type", options.room_type)
+    if (options.category) params.set("category", options.category)
+    if (options.is_featured) params.set("is_featured", "true")
+    if (options.sort) params.set("sort", options.sort)
+    if (options.query) params.set("query", options.query)
+
+    return `/api/products?${params.toString()}`
+  }
+
+  const {
+    data,
+    error,
+    size,
+    setSize,
     isLoading,
+    isValidating,
+  } = useSWRInfinite<ProductsResponse>(getKey, fetcher, {
+    revalidateOnFocus: false,
+    dedupingInterval: 60_000,
+  })
+
+  const products = data ? data.flatMap((page) => page.data) : []
+
+  const lastPage = data?.[data.length - 1]
+
+  return {
+    products,
+    total: lastPage?.pagination.total ?? 0,
+    isLoading,
+    isValidating,
     isError: error,
+    hasMore: lastPage?.pagination.hasMore ?? false,
+    loadMore: () => setSize(size + 1),
   }
 }
-
 export function useProduct(slug: string) {
   const { data, error, isLoading } = useSWR<{
     product: Product

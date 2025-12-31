@@ -14,10 +14,9 @@ export async function getProducts({
   sort?: any[]
   filter?: any
 }): Promise<PaginatedResult<Product>> {
-  const { where, values } = query.buildWhere(filter, { alias: "p" })
+  const where = query.buildWhere(filter, { alias: "p" })
   const orderBy = query.buildOrderBy(sort, { alias: "p", categoryAlias: "c" })
   const { offset } = query.buildPagination(page, limit)
-
   // ===== DATA QUERY =====
   const items = (await sql`
     SELECT
@@ -33,8 +32,8 @@ export async function getProducts({
       c.name AS category_name
     FROM products p
     LEFT JOIN categories c ON p.category_id = c.id
-    ${sql.unsafe(where)}
-    ${sql.unsafe(orderBy)}
+    ${where}
+    ${orderBy ? sql.unsafe(orderBy) : sql``}
     LIMIT ${limit}
     OFFSET ${offset}
   `) as Product[]
@@ -44,7 +43,7 @@ export async function getProducts({
     SELECT COUNT(*)::int AS count
     FROM products p
     LEFT JOIN categories c ON p.category_id = c.id
-    ${sql.unsafe(where)}
+     ${where}
   `) as { count: number }[]
 
   return {

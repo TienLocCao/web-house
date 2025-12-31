@@ -2,6 +2,7 @@ import { z } from "zod"
 
 // Product validation schemas
 export const ProductQuerySchema = z.object({
+  query: z.string().optional(),
   category: z.string().optional(),
   room_type: z.enum(["living_room", "dining_room", "bedroom", "kitchen", "bathroom", "office"]).optional(),
   min_price: z.number().min(0).optional(),

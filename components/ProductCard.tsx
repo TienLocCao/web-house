@@ -33,16 +33,16 @@ export function ProductCard({ product }: ProductCardProps) {
         <h3 className="font-semibold line-clamp-2 group-hover:text-primary transition-colors">{product.name}</h3>
 
         <div className="flex items-center gap-2">
-          <span className="text-lg font-bold">${product.price.toFixed(2)}</span>
+          <span className="text-lg font-bold">${Number(product.price).toFixed(2)}</span>
           {product.original_price && (
-            <span className="text-sm text-muted-foreground line-through">${product.original_price.toFixed(2)}</span>
+            <span className="text-sm text-muted-foreground line-through">${Number(product.original_price).toFixed(2)}</span>
           )}
         </div>
 
         <div className="flex items-center gap-2 text-sm">
           <div className="flex items-center">
             <span className="text-yellow-500">★</span>
-            <span className="ml-1">{product.rating.toFixed(1)}</span>
+            <span className="ml-1">{Number(product.rating).toFixed(1)}</span>
           </div>
           <span className="text-muted-foreground">({product.review_count} reviews)</span>
         </div>

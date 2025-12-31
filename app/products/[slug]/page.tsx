@@ -67,17 +67,17 @@ export default function ProductDetailPage() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="flex items-center">
                     <span className="text-yellow-500 text-xl">★</span>
-                    <span className="ml-1 font-semibold">{product.rating.toFixed(1)}</span>
+                    <span className="ml-1 font-semibold">{Number(product.rating).toFixed(1)}</span>
                   </div>
                   <span className="text-muted-foreground">({product.review_count} reviews)</span>
                 </div>
               </div>
 
               <div className="flex items-baseline gap-3">
-                <span className="text-4xl font-bold">${product.price.toFixed(2)}</span>
+                <span className="text-4xl font-bold">${Number(product.price).toFixed(2)}</span>
                 {product.original_price && (
                   <span className="text-xl text-muted-foreground line-through">
-                    ${product.original_price.toFixed(2)}
+                    ${Number(product.original_price).toFixed(2)}
                   </span>
                 )}
               </div>

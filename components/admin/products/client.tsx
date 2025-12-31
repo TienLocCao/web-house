@@ -1,6 +1,6 @@
 "use client"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import Link from "next/link"
 import { useToast } from "@/hooks/useToast"
 import { Button } from "@/components/ui/button"
@@ -8,6 +8,10 @@ import { Plus, Edit, Trash } from "lucide-react"
 import ProductCreateEditDialog from "@/components/admin/products/createEditDialog"
 import { ProductsTable } from "@/components/admin/products/table"
 import { ProductDeleteDialog } from "@/components/admin/products/deleteDialog"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useRoomTypes } from "@/hooks/useRoomTypes"
+import { useDebounce } from "@/hooks/useDebounce"
 
 export default function ProductsClient({ initialData, initialTotal }: any) {
   const router = useRouter()
@@ -17,6 +21,15 @@ export default function ProductsClient({ initialData, initialTotal }: any) {
   const [selected, setSelected] = useState<any>(null)
    const [refreshKey, setRefreshKey] = useState(0)
 
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const roomType = searchParams.get("room_type") || undefined
+  const sort = searchParams.get("sort") || "newest"
+  const query = searchParams.get("query") || ""
+
+  const [searchQuery, setSearchQuery] = useState(query)
+  const debouncedSearch = useDebounce(searchQuery, 300)
+
   async function handleSave() {
     setCreateOpen(false)
     setEditOpen(false)
@@ -25,6 +38,24 @@ export default function ProductsClient({ initialData, initialTotal }: any) {
   }
 
   const { toast } = useToast()
+
+  const { values: roomTypes } = useRoomTypes()
+
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams)
+    debouncedSearch
+      ? params.set("query", debouncedSearch)
+      : params.delete("query")
+
+    router.replace(`${pathname}?${params.toString()}`)
+  }, [debouncedSearch])
+
+  const handRoomTypeChange  = (value: string) => {
+    const params = new URLSearchParams(searchParams)
+    params.set("room_type", value)
+    router.push(`${pathname}?${params.toString()}`)
+  }
 
   async function handleDeleteConfirm(id: string) {
     try {
@@ -59,10 +90,39 @@ export default function ProductsClient({ initialData, initialTotal }: any) {
         </Button>
       </div>
 
+      <div className="flex items-center gap-4">
+        <div className="w-64">
+          <Input
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="md:w-[250px]"
+            />
+        </div>
+
+        <div>
+          <Select value={roomType} onValueChange={handRoomTypeChange}>
+            <SelectTrigger className="w-56">
+              <SelectValue placeholder="All room types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              {roomTypes.map((rt: string) => (
+                <SelectItem key={rt} value={rt}>
+                  {rt.replace("_", " ")}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       <ProductsTable
         initialData={initialData}
         initialTotal={initialTotal}
         refreshKey={refreshKey}
+        search={debouncedSearch}
+        roomType={roomType}
         onEdit={(product: any) => { setSelected(product); setEditOpen(true) }}
         onDelete={(product: any) => { setSelected(product); setDeleteOpen(true) }}
       />
