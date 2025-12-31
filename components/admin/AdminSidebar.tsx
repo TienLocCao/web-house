@@ -81,27 +81,38 @@ export function AdminSidebar({ admin, activePage, setActivePage, isCollapsed, se
           <nav className="flex-1 space-y-1 p-4">
             
             {navigation.map((item) => {
-                const Icon = item.icon
+              const Icon = item.icon
                 const isActive = isActivePath(pathname, item.href)
 
-                return (
+                const menuButton =  (
                   <li key={item.name}>
                     <Link
                       href={item.href}
-                      className={cn(
-                        "flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors",
+                  className={cn(
+                    "flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors",
                         isActive
-                          ? "bg-primary text-primary-foreground shadow-sm"
-                          : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                        isCollapsed && "justify-center px-2",
-                      )}
-                    >
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    isCollapsed && "justify-center px-2",
+                  )}
+                >
                       <Icon className="w-5 h-5" />
-                      <span className="font-medium">{item.name}</span>
+                      {!isCollapsed && <span className="font-medium"><span>{item.name}</span></span>}
                     </Link>
                   </li>
                 )
-              })}
+                if (isCollapsed) {
+                return (
+                  <Tooltip key={item.name}>
+                    <TooltipTrigger asChild>{menuButton}</TooltipTrigger>
+                    <TooltipContent side="right" className="font-medium">
+                      {item.name}
+                    </TooltipContent>
+                  </Tooltip>
+                )
+              }
+                return menuButton
+            })}
           </nav>
         </TooltipProvider>
 
