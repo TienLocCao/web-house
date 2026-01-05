@@ -31,7 +31,7 @@ export function OrdersTable({ initialData, initialTotal, search, status }: Order
   const [data, setData] = useState<Order[]>(initialData)
   const [total, setTotal] = useState(initialTotal)
   const [page, setPage] = useState(1)
-  const [limit] = useState(5)
+  const [limit] = useState(10)
   const [sort, setSort] = useState<SortItem[]>([])
   const [loading, setLoading] = useState(false)
   const [updating, setUpdating] = useState<number | null>(null)

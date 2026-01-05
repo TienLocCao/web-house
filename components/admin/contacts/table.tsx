@@ -27,7 +27,7 @@ export function ContactsTable({ initialData, initialTotal, search, status }: Con
   const [data, setData] = useState<Contact[]>(initialData)
   const [total, setTotal] = useState(initialTotal)
   const [page, setPage] = useState(1)
-  const [limit] = useState(5)
+  const [limit] = useState(10)
   const [loading, setLoading] = useState(false)
   const [updating, setUpdating] = useState<number | null>(null)
 

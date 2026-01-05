@@ -6,6 +6,6 @@ export const metadata: Metadata = { title: "Projects | Admin", description: "Man
 export const dynamic = "force-dynamic"
 
 export default async function AdminProjectsPage() {
-  const { items, total } = await getProjects({ page: 1, limit: 5 })
+  const { items, total } = await getProjects({ page: 1, limit: 10 })
   return <ProjectsClient initialData={items} initialTotal={total} />
 }

@@ -18,7 +18,7 @@ export function CategoriesTable({ initialData, initialTotal, onEdit, onDelete, r
   const [data, setData] = useState<Category[]>(initialData)
   const [total, setTotal] = useState(initialTotal)
   const [page, setPage] = useState(1)
-  const [limit] = useState(5)
+  const [limit] = useState(10)
   const [sort, setSort] = useState<SortItem[]>([])
   const [loading, setLoading] = useState(false)
 

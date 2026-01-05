@@ -28,7 +28,7 @@ export function ProductsTable({
   const [data, setData] = useState<Product[]>(initialData)
   const [total, setTotal] = useState(initialTotal)
   const [page, setPage] = useState(1)
-  const [limit] = useState(5)
+  const [limit] = useState(10)
   const [sort, setSort] = useState<SortItem[]>([])
   const [loading, setLoading] = useState(false)
 

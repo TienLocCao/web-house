@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic"
 
 export default async function AdminProductsPage() {
-  const { items, total } = await getProducts({ page: 1, limit: 5 })
+  const { items, total } = await getProducts({ page: 1, limit: 10 })
 
   return (
     <ProductsClient
