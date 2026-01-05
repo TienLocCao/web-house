@@ -32,7 +32,7 @@ export default function AdminShell({
         <AdminHeader admin={admin} isCollapsed={isCollapsed} />
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="flex-1 flex flex-col overflow-y-auto px-6 pt-6 py-2">{children}</main>
         <SessionRefresher />
       </div>
     </div>

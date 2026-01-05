@@ -87,8 +87,8 @@ export default function ProductsClient({ initialData, initialTotal }: any) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 flex flex-col min-h-0">
+      <div className="flex items-center justify-between shrink-0">
         <div>
           <h1 className="text-3xl font-bold text-neutral-900">Products</h1>
           <p className="text-neutral-600 mt-1">Manage your product catalog</p>
@@ -101,7 +101,7 @@ export default function ProductsClient({ initialData, initialTotal }: any) {
         </Button>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 shrink-0">
         <div className="relative w-64">
           <Input
             placeholder="Search products..."
