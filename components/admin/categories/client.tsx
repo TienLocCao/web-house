@@ -1,14 +1,23 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { useToast } from "@/hooks/useToast"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import CategoryCreateEditDialog from "@/components/admin/categories/createEditDialog"
 import { CategoriesTable } from "@/components/admin/categories/table"
 import { CategoryDeleteDialog } from "@/components/admin/categories/deleteDialog"
+import { Input } from "@/components/ui/input"
+import { useDebounce } from "@/hooks/useDebounce"
+import { X } from "lucide-react"
 
 export default function CategoriesClient({ initialData, initialTotal }: any) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const query = searchParams.get("query") || ""
+
   const { toast } = useToast()
   const [createOpen, setCreateOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
@@ -16,10 +25,27 @@ export default function CategoriesClient({ initialData, initialTotal }: any) {
   const [selected, setSelected] = useState<any>(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
+  const [searchQuery, setSearchQuery] = useState(query)
+  const debouncedSearch = useDebounce(searchQuery, 300)
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams)
+    debouncedSearch
+      ? params.set("query", debouncedSearch)
+      : params.delete("query")
+
+    router.replace(`${pathname}?${params.toString()}`)
+  }, [debouncedSearch])
+
   async function handleSave() {
     setCreateOpen(false)
     setEditOpen(false)
     setRefreshKey((s) => s + 1)
+  }
+
+  const handleClearFilters = () => {
+    setSearchQuery("")
+    router.push(pathname)
   }
 
   async function handleDeleteConfirm(id: string) {
@@ -51,7 +77,40 @@ export default function CategoriesClient({ initialData, initialTotal }: any) {
         </Button>
       </div>
 
-      <CategoriesTable initialData={initialData} initialTotal={initialTotal} refreshKey={refreshKey} onEdit={(c: any) => { setSelected(c); setEditOpen(true) }} onDelete={(c: any) => { setSelected(c); setDeleteOpen(true) }} />
+      <div className="flex items-center gap-4">
+        <div className="relative w-64">
+          <Input
+            placeholder="Search categories..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="md:w-[250px] pr-8"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {searchQuery && (
+          <Button variant="outline" onClick={handleClearFilters} className="gap-2">
+            <X className="w-4 h-4" />
+            Clear Filters
+          </Button>
+        )}
+      </div>
+
+      <CategoriesTable 
+        initialData={initialData} 
+        initialTotal={initialTotal} 
+        refreshKey={refreshKey}
+        search={debouncedSearch}
+        onEdit={(c: any) => { setSelected(c); setEditOpen(true) }} 
+        onDelete={(c: any) => { setSelected(c); setDeleteOpen(true) }} 
+      />
 
       <CategoryCreateEditDialog mode="create" open={createOpen} onOpenChange={setCreateOpen} onSaved={handleSave} />
 

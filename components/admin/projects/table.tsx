@@ -11,9 +11,11 @@ interface ProjectsTableProps {
   onEdit: (p: Project) => void
   onDelete: (p: Project) => void
   refreshKey?: number
+  search?: string
+  status?: string
 }
 
-export function ProjectsTable({ initialData, initialTotal, onEdit, onDelete, refreshKey }: ProjectsTableProps) {
+export function ProjectsTable({ initialData, initialTotal, onEdit, onDelete, refreshKey, search, status }: ProjectsTableProps) {
   const [data, setData] = useState<Project[]>(initialData)
   const [total, setTotal] = useState(initialTotal)
   const [page, setPage] = useState(1)
@@ -41,7 +43,14 @@ export function ProjectsTable({ initialData, initialTotal, onEdit, onDelete, ref
     async function fetchData() {
       setLoading(true)
       try {
-        const res = await fetch(`/api/admin/projects?page=${page}&limit=${limit}&sort=${encodeURIComponent(JSON.stringify(sort))}`)
+        const params = new URLSearchParams()
+        params.set("page", String(page))
+        params.set("limit", String(limit))
+        params.set("sort", JSON.stringify(sort))
+        if (search) params.set("search", search)
+        if (status) params.set("status", status)
+
+        const res = await fetch(`/api/admin/projects?${params.toString()}`)
         if (!res.ok) throw new Error("Failed to fetch projects")
         const json: { items: Project[]; total: number } = await res.json()
         if (!ignore) {
@@ -57,7 +66,12 @@ export function ProjectsTable({ initialData, initialTotal, onEdit, onDelete, ref
     }
     fetchData()
     return () => { ignore = true }
-  }, [page, sort, refreshKey])
+  }, [page, sort, refreshKey, search, status])
+
+  // when filters change, reset to first page
+  useEffect(() => {
+    setPage(1)
+  }, [search, status])
 
   const deleteMany = async (ids: number[], mode: string) => {
     if (ids.length === 0 && mode !== "all") return

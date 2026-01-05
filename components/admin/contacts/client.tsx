@@ -2,30 +2,19 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
-import { useToast } from "@/hooks/useToast"
-import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
-import ProjectCreateEditDialog from "@/components/admin/projects/createEditDialog"
-import { ProjectsTable } from "@/components/admin/projects/table"
-import { ProjectDeleteDialog } from "@/components/admin/projects/deleteDialog"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useDebounce } from "@/hooks/useDebounce"
+import { ContactsTable } from "@/components/admin/contacts/table"
 import { X } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
-export default function ProjectsClient({ initialData, initialTotal }: any) {
+export default function ContactsClient({ initialData, initialTotal }: any) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const query = searchParams.get("query") || ""
   const status = searchParams.get("status") || undefined
-
-  const { toast } = useToast()
-  const [createOpen, setCreateOpen] = useState(false)
-  const [editOpen, setEditOpen] = useState(false)
-  const [deleteOpen, setDeleteOpen] = useState(false)
-  const [selected, setSelected] = useState<any>(null)
-  const [refreshKey, setRefreshKey] = useState(0)
 
   const [searchQuery, setSearchQuery] = useState(query)
   const debouncedSearch = useDebounce(searchQuery, 300)
@@ -54,42 +43,17 @@ export default function ProjectsClient({ initialData, initialTotal }: any) {
     router.push(pathname)
   }
 
-  async function handleSave() {
-    setCreateOpen(false)
-    setEditOpen(false)
-    setRefreshKey((s) => s + 1)
-  }
-
-  async function handleDeleteConfirm(id: string) {
-    try {
-      const res = await fetch(`/api/admin/projects/${id}`, { method: "DELETE", credentials: "include" })
-      const json = await res.json().catch(() => null)
-      if (!res.ok) {
-        toast({ title: json?.message || "Failed to delete project", type: "error" })
-        return
-      }
-      toast({ title: "Project deleted", type: "success" })
-      setDeleteOpen(false)
-      setRefreshKey((s) => s + 1)
-    } catch (err: any) {
-      toast({ title: "Something went wrong", description: String(err), type: "error" })
-    }
-  }
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-neutral-900">Projects</h1>
-          <p className="text-neutral-600 mt-1">Manage projects and portfolios</p>
-        </div>
-        <Button onClick={() => setCreateOpen(true)} className="gap-2"><Plus className="w-4 h-4" />Add Project</Button>
+      <div>
+        <h1 className="text-3xl font-bold text-neutral-900">Contact Inquiries</h1>
+        <p className="text-neutral-600 mt-1">Manage customer inquiries and messages</p>
       </div>
 
       <div className="flex items-center gap-4">
         <div className="relative w-64">
           <Input
-            placeholder="Search projects..."
+            placeholder="Search contacts..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="md:w-[250px] pr-8"
@@ -111,10 +75,10 @@ export default function ProjectsClient({ initialData, initialTotal }: any) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="planning">Planning</SelectItem>
+              <SelectItem value="new">New</SelectItem>
               <SelectItem value="in_progress">In Progress</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="on_hold">On Hold</SelectItem>
+              <SelectItem value="resolved">Resolved</SelectItem>
+              <SelectItem value="closed">Closed</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -127,19 +91,14 @@ export default function ProjectsClient({ initialData, initialTotal }: any) {
         )}
       </div>
 
-      <ProjectsTable 
-        initialData={initialData} 
-        initialTotal={initialTotal} 
-        refreshKey={refreshKey}
+      <ContactsTable 
+        initialData={initialData}
+        initialTotal={initialTotal}
         search={debouncedSearch}
         status={status}
-        onEdit={(p: any) => { setSelected(p); setEditOpen(true) }} 
-        onDelete={(p: any) => { setSelected(p); setDeleteOpen(true) }} 
       />
-
-      <ProjectCreateEditDialog mode="create" open={createOpen} onOpenChange={setCreateOpen} onSaved={handleSave} />
-      <ProjectCreateEditDialog mode="edit" project={selected} open={editOpen} onOpenChange={setEditOpen} onSaved={handleSave} />
-      <ProjectDeleteDialog open={deleteOpen} onOpenChange={setDeleteOpen} onDeleteConfirm={() => selected && handleDeleteConfirm(selected.id)} />
     </div>
   )
 }
+
+
