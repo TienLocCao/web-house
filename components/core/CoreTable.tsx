@@ -29,6 +29,7 @@ import { cn } from "@/lib/utils"
 import type { Column, SortItem } from "@/lib/types/table"
 import { useTableSelection } from "@/hooks/useTableSelection"
 import { CoreTableSkeleton } from "./CoreTableSkeleton"
+import type { TableSelection } from "@/hooks/useTableSelection"
 
 interface CoreTableProps<T extends { id: number }> {
   columns: Column<T>[]
@@ -45,11 +46,11 @@ interface CoreTableProps<T extends { id: number }> {
   onDelete?: (item: T) => void
 
   renderBulkActionBar?: (
-    selection: ReturnType<typeof useTableSelection>
+    selection: TableSelection
   ) => React.ReactNode
 }
 
-export function CoreTable<T extends { id: number }>({
+export const CoreTable = <T extends { id: number }>({
   columns,
   data,
   total,
@@ -62,7 +63,7 @@ export function CoreTable<T extends { id: number }>({
   onEdit,
   onDelete,
   renderBulkActionBar,
-}: CoreTableProps<T>) {
+}: CoreTableProps<T>) => {
   const totalPages = Math.max(1, Math.ceil(total / limit))
 
   const idsOnPage = React.useMemo(

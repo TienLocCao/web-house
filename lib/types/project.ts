@@ -18,7 +18,7 @@ export interface GalleryItem {
  * - budget để string (form) → convert number khi save DB
  */
 export interface Project {
-  id?: string
+  id: number
 
   title: string
   slug: string

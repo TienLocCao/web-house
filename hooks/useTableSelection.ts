@@ -1,10 +1,26 @@
 import * as React from "react"
 export type SelectionMode = 'none' | 'page' | 'all'
 
+
+export interface TableSelection {
+  mode: SelectionMode
+  selectedIds: number[]
+  excludedIds: number[]
+  selectedCount: number
+  isPageAllSelected: boolean
+  isIndeterminate: boolean
+
+  isRowSelected: (id: number) => boolean
+  toggleRow: (id: number, checked: boolean) => void
+  toggleSelectPage: (checked: boolean) => void
+  selectAllCrossPage: () => void
+  clear: () => void
+}
+
 export function useTableSelection(
   idsOnPage: number[],
   total: number
-) {
+): TableSelection {
   const [mode, setMode] = React.useState<SelectionMode>('none')
   const [selectedIds, setSelectedIds] = React.useState<number[]>([])
   const [excludedIds, setExcludedIds] = React.useState<number[]>([])
