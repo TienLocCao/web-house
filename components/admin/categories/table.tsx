@@ -11,9 +11,10 @@ interface CategoriesTableProps {
   onEdit: (c: Category) => void
   onDelete: (c: Category) => void
   refreshKey?: number
+  search?: string
 }
 
-export function CategoriesTable({ initialData, initialTotal, onEdit, onDelete, refreshKey }: CategoriesTableProps) {
+export function CategoriesTable({ initialData, initialTotal, onEdit, onDelete, refreshKey, search }: CategoriesTableProps) {
   const [data, setData] = useState<Category[]>(initialData)
   const [total, setTotal] = useState(initialTotal)
   const [page, setPage] = useState(1)
@@ -39,7 +40,13 @@ export function CategoriesTable({ initialData, initialTotal, onEdit, onDelete, r
     async function fetchData() {
       setLoading(true)
       try {
-        const res = await fetch(`/api/admin/categories?page=${page}&limit=${limit}&sort=${encodeURIComponent(JSON.stringify(sort))}`)
+        const params = new URLSearchParams()
+        params.set("page", String(page))
+        params.set("limit", String(limit))
+        params.set("sort", JSON.stringify(sort))
+        if (search) params.set("search", search)
+
+        const res = await fetch(`/api/admin/categories?${params.toString()}`)
         if (!res.ok) throw new Error("Failed to fetch categories")
         const json: { items: Category[]; total: number } = await res.json()
         if (!ignore) {
@@ -59,7 +66,12 @@ export function CategoriesTable({ initialData, initialTotal, onEdit, onDelete, r
 
     fetchData()
     return () => { ignore = true }
-  }, [page, sort, refreshKey])
+  }, [page, sort, refreshKey, search])
+
+  // when filters change, reset to first page
+  useEffect(() => {
+    setPage(1)
+  }, [search])
 
   const deleteMany = async (ids: number[], mode: string) => {
     if (ids.length === 0 && mode !== "all") return

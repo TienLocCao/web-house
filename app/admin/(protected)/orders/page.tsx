@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
-import { sql } from "@/lib/db"
-import { OrdersTable } from "@/components/OrdersTable"
 import { getOrders } from "@/lib/services/orders"
+import OrdersClient from "@/components/admin/orders/client"
 
 export const metadata: Metadata = {
   title: "Orders | Admin",
@@ -11,16 +10,12 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic"
 
 export default async function AdminOrdersPage() {
-  const orders = await getOrders()
+  const { items, total } = await getOrders({ page: 1, limit: 5 })
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-neutral-900">Orders</h1>
-        <p className="text-neutral-600 mt-1">Manage customer orders and fulfillment</p>
-      </div>
-
-      <OrdersTable orders={orders} />
-    </div>
+    <OrdersClient
+      initialData={items}
+      initialTotal={total}
+    />
   )
 }

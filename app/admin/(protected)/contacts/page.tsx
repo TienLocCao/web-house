@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
-import { sql } from "@/lib/db"
-import { ContactsTable } from "@/components/ContactsTable"
 import { getContacts } from "@/lib/services/contacts"
+import ContactsClient from "@/components/admin/contacts/client"
 
 export const metadata: Metadata = {
   title: "Contacts | Admin",
@@ -11,16 +10,12 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic"
 
 export default async function AdminContactsPage() {
-  const contacts = await getContacts()
+  const { items, total } = await getContacts({ page: 1, limit: 5 })
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-neutral-900">Contact Inquiries</h1>
-        <p className="text-neutral-600 mt-1">Manage customer inquiries and messages</p>
-      </div>
-
-      <ContactsTable contacts={contacts} />
-    </div>
+    <ContactsClient
+      initialData={items}
+      initialTotal={total}
+    />
   )
 }

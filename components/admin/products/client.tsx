@@ -1,3 +1,4 @@
+
 "use client"
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
@@ -12,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useRoomTypes } from "@/hooks/useRoomTypes"
 import { useDebounce } from "@/hooks/useDebounce"
+import { X } from "lucide-react"
 
 export default function ProductsClient({ initialData, initialTotal }: any) {
   const router = useRouter()
@@ -53,8 +55,17 @@ export default function ProductsClient({ initialData, initialTotal }: any) {
 
   const handRoomTypeChange  = (value: string) => {
     const params = new URLSearchParams(searchParams)
-    params.set("room_type", value)
+    if (value === "all") {
+      params.delete("room_type")
+    } else {
+      params.set("room_type", value)
+    }
     router.push(`${pathname}?${params.toString()}`)
+  }
+
+  const handleClearFilters = () => {
+    setSearchQuery("")
+    router.push(pathname)
   }
 
   async function handleDeleteConfirm(id: string) {
@@ -91,17 +102,25 @@ export default function ProductsClient({ initialData, initialTotal }: any) {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="w-64">
+        <div className="relative w-64">
           <Input
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="md:w-[250px]"
-            />
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="md:w-[250px] pr-8"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         <div>
-          <Select value={roomType} onValueChange={handRoomTypeChange}>
+          <Select value={roomType || "all"} onValueChange={handRoomTypeChange}>
             <SelectTrigger className="w-56">
               <SelectValue placeholder="All room types" />
             </SelectTrigger>
@@ -115,6 +134,13 @@ export default function ProductsClient({ initialData, initialTotal }: any) {
             </SelectContent>
           </Select>
         </div>
+
+        {(searchQuery || (roomType && roomType !== "all")) && (
+          <Button variant="outline" onClick={handleClearFilters} className="gap-2">
+            <X className="w-4 h-4" />
+            Clear Filters
+          </Button>
+        )}
       </div>
 
       <ProductsTable

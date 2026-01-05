@@ -14,21 +14,21 @@ export async function getCategories({
   sort?: any[]
   filter?: any
 }): Promise<PaginatedResult<Category>> {
-  const { where, values } = query.buildWhere(filter)
+  const where = query.buildWhere(filter)
   const orderBy = query.buildOrderBy(sort)
   const { offset } = query.buildPagination(page, limit)
 
   const items = (await sql`
     SELECT id, name, slug, description, image_url, created_at, updated_at
     FROM categories
-    ${sql.unsafe(where)}
+    ${where}
     ${sql.unsafe(orderBy)}
     LIMIT ${limit}
     OFFSET ${offset}
   `) as Category[]
 
   const [{ count }] = (await sql`
-    SELECT COUNT(*)::int AS count FROM categories ${sql.unsafe(where)}
+    SELECT COUNT(*)::int AS count FROM categories ${where}
   `) as { count: number }[]
 
   return {

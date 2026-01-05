@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { uploadImage, deleteImage } from "@/lib/services/image-upload"
+import { uploadImage, deleteImage } from "@/lib/services/imageUpload"
 import { Button } from "@/components/ui/button"
 
 export type GalleryItem = {
