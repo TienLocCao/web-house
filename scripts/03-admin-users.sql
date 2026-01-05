@@ -22,6 +22,10 @@ CREATE TABLE IF NOT EXISTS admin_sessions (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
+ALTER TABLE admin_sessions
+ADD COLUMN last_activity_at TIMESTAMP NOT NULL DEFAULT NOW();
+
+
 -- Create indexes
 CREATE INDEX IF NOT EXISTS idx_admin_users_email ON admin_users(email);
 CREATE INDEX IF NOT EXISTS idx_admin_sessions_token ON admin_sessions(session_token);

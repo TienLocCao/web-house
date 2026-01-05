@@ -1,7 +1,27 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import { validateSessionFromRequest } from "@/lib/auth"
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  /* =========================
+   * 1. AUTH GUARD cho admin API
+   * ========================= */
+  if (pathname.startsWith("/api/admin")) {
+    const admin = await validateSessionFromRequest(request)
+
+    if (!admin) {
+      return NextResponse.json(
+        { message: "Unauthorized" },
+        { status: 401 }
+      )
+    }
+  }
+
+  /* =========================
+   * 2. NEXT RESPONSE
+   * ========================= */
   const response = NextResponse.next()
 
   // Security headers
