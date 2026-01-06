@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { requireAuth } from "@/lib/auth"
+import { withAdminAuth } from "@/lib/admin-api"
 import { z } from "zod"
 
 export const runtime = "edge"
@@ -11,10 +11,15 @@ const StatusUpdateSchema = z.object({
 
 // PATCH /api/admin/orders/[id]/status - Update order status
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    await requireAuth()
-
-    const orderId = Number.parseInt(params.id)
+  return withAdminAuth(request, async (admin) => {
+    if (!["super_admin", "admin"].includes(admin.role)) {
+      return NextResponse.json(
+        { message: "Forbidden" },
+        { status: 403 }
+      )
+    }
+    try {
+      const orderId = Number.parseInt(params.id)
     const body = await request.json()
     const { status } = StatusUpdateSchema.parse(body)
 
@@ -28,18 +33,19 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     // Update order status
     await sql`UPDATE orders SET status = ${status} WHERE id = ${orderId}`
 
-    return NextResponse.json({ message: "Order status updated successfully" })
-  } catch (error) {
-    console.error("[v0] Update order status error:", error)
+      return NextResponse.json({ message: "Order status updated successfully" })
+    } catch (error) {
+      console.error("[v0] Update order status error:", error)
 
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: "Invalid status value" }, { status: 400 })
+      if (error instanceof z.ZodError) {
+        return NextResponse.json({ error: "Invalid status value" }, { status: 400 })
+      }
+
+      if (error instanceof Error && error.message === "Unauthorized") {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      }
+
+      return NextResponse.json({ error: "Failed to update order status" }, { status: 500 })
     }
-
-    if (error instanceof Error && error.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    return NextResponse.json({ error: "Failed to update order status" }, { status: 500 })
-  }
+  })
 }

@@ -37,8 +37,6 @@ export async function POST(request: NextRequest) {
       FROM admin_users
       WHERE email = ${email.toLowerCase()}
     `
-      
-    
 
     if (!admin) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 })

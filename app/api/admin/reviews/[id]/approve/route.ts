@@ -1,15 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { requireAuth } from "@/lib/auth"
+import { withAdminAuth } from "@/lib/admin-api"
 
 export const runtime = "edge"
 
 // PATCH /api/admin/reviews/[id]/approve - Approve review
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    await requireAuth()
-
-    const reviewId = Number.parseInt(params.id)
+  return withAdminAuth(request, async (admin) => {
+    try {
+      const reviewId = Number.parseInt(params.id)
 
     await sql`UPDATE reviews SET is_approved = true WHERE id = ${reviewId}`
 
@@ -24,9 +23,10 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       await sql`UPDATE products SET rating = ${stats.avg_rating || 0}, review_count = ${stats.count || 0} WHERE id = ${review.product_id}`
     }
 
-    return NextResponse.json({ message: "Review approved successfully" })
-  } catch (error) {
-    console.error("[v0] Approve review error:", error)
-    return NextResponse.json({ error: "Failed to approve review" }, { status: 500 })
-  }
+      return NextResponse.json({ message: "Review approved successfully" })
+    } catch (error) {
+      console.error("[v0] Approve review error:", error)
+      return NextResponse.json({ error: "Failed to approve review" }, { status: 500 })
+    }
+  })
 }

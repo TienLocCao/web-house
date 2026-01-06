@@ -2,15 +2,14 @@ import { NextRequest, NextResponse } from "next/server"
 import path from "path"
 import fs from "fs/promises"
 import crypto from "crypto"
-import { requireAuth } from "@/lib/auth"
+import { withAdminAuth } from "@/lib/admin-api"
 import { deleteImageByUrl } from "@/lib/fs"
 
 export const runtime = "nodejs"
 
-export async function POST(request: NextRequest) {
-  await requireAuth()
-
-  const form = await request.formData()
+export const POST = (request: NextRequest) =>
+  withAdminAuth(request, async (admin) => {
+    const form = await request.formData()
   const file = form.get("image") as File | null
   const old = form.get("old_image_url") as string | null
 
@@ -35,21 +34,20 @@ export async function POST(request: NextRequest) {
     console.error(err)
     return NextResponse.json({ message: "Upload failed" }, { status: 500 })
   }
-}
+  })
 
-export async function DELETE(request: NextRequest) {
-  await requireAuth()
+export const DELETE = (request: NextRequest) =>
+  withAdminAuth(request, async (admin) => {
+    try {
+      const json = await request.json()
+      const imageUrl = typeof json?.image_url === "string" ? json.image_url : undefined
+      if (!imageUrl) return NextResponse.json({ message: "image_url required" }, { status: 400 })
 
-  try {
-    const json = await request.json()
-    const imageUrl = typeof json?.image_url === "string" ? json.image_url : undefined
-    if (!imageUrl) return NextResponse.json({ message: "image_url required" }, { status: 400 })
+      await deleteImageByUrl(imageUrl)
 
-    await deleteImageByUrl(imageUrl)
-
-    return NextResponse.json({ ok: true })
-  } catch (err) {
-    console.error("Delete upload failed", err)
-    return NextResponse.json({ message: "Delete failed" }, { status: 500 })
-  }
-}
+      return NextResponse.json({ ok: true })
+    } catch (err) {
+      console.error("Delete upload failed", err)
+      return NextResponse.json({ message: "Delete failed" }, { status: 500 })
+    }
+  })

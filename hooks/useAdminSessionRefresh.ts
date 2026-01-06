@@ -9,6 +9,8 @@ type Options = {
   onLogout?: () => void
 }
 
+const ADMIN_LAST_ACTIVE_KEY = "admin-last-active"
+
 export function useAdminSessionRefresh({
   intervalMs = 1000 * 60 * 60 * 12, // default 12 hours
   idleTimeoutMs = 1000 * 60 * 60 * 24, // set to ms to enable idle logout
@@ -27,6 +29,10 @@ export function useAdminSessionRefresh({
     } catch (e) {
       // ignore network errors; still proceed to client-side logout
     }
+
+    try {
+      localStorage.removeItem(ADMIN_LAST_ACTIVE_KEY)
+    } catch {}
 
     if (notify && typeof BroadcastChannel !== "undefined") {
       try {
@@ -57,6 +63,11 @@ export function useAdminSessionRefresh({
 
   const resetIdle = useCallback(() => {
     if (!idleTimeoutMs) return
+
+    try {
+      localStorage.setItem(ADMIN_LAST_ACTIVE_KEY, Date.now().toString())
+    } catch {}
+
     if (idleRef.current) {
       clearTimeout(idleRef.current)
     }
@@ -66,6 +77,18 @@ export function useAdminSessionRefresh({
   }, [idleTimeoutMs, performLogout])
 
   useEffect(() => {
+    try {
+      const last = localStorage.getItem(ADMIN_LAST_ACTIVE_KEY)
+      if (
+        last &&
+        idleTimeoutMs &&
+        Date.now() - Number(last) > idleTimeoutMs
+      ) {
+        performLogout()
+        return
+      }
+    } catch {}
+    
     // BroadcastChannel for multi-tab logout sync
     if (typeof BroadcastChannel !== "undefined") {
       bcRef.current = new BroadcastChannel("admin-auth")

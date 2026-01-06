@@ -103,10 +103,10 @@ export const CoreTable = <T extends { id: number }>({
   }
 
   return (
-    <div className="space-y-4 relative">
+    <div className="space-y-4 relative flex-1 flex flex-col min-h-0 mb-0">
       {/* Overlay loading */}
       {isLoading && (
-        <div className="absolute inset-0 bg-white/60 z-20 flex items-center justify-center">
+        <div className="absolute inset-0 bg-white/60 z-20 flex items-center justify-center shrink-0">
           <span className="animate-spin text-lg">⏳</span>
         </div>
       )}
@@ -115,15 +115,15 @@ export const CoreTable = <T extends { id: number }>({
       {selection.selectedCount > 0 &&
         renderBulkActionBar?.(selection)}
 
-      <Card className="pt-0">
-        <CardContent className="p-0">
+      <Card className="pt-0 shrink-0 flex-1 flex flex-col min-h-0 mb-0 min-h-[500px]">
+        <CardContent className="p-0 flex-1 flex flex-col min-h-0">
           {/* scroll container */}
-          <div className="relative overflow-x-auto">
+          <div className="relative flex-1 flex flex-col overflow-auto">
             <Table>
-              <TableHeader>
-                <TableRow>
+              <TableHeader className="sticky z-30">
+                <TableRow className="sticky top-0 z-20 bg-background hover:bg-background">
                   {/* Checkbox column */}
-                  <TableHead className="w-10 sticky left-0 bg-background z-10">
+                  <TableHead className="left-0 bg-background z-30">
                     <Checkbox
                       checked={headerCheckboxState()}
                       onCheckedChange={(v) =>
@@ -206,7 +206,7 @@ export const CoreTable = <T extends { id: number }>({
 
                       {/* Data cells */}
                       {columns.map((col) => (
-                        <TableCell key={String(col.key)}>
+                        <TableCell key={String(col.key)} className="bg-white">
                           {col.render
                             ? col.render(row)
                             : String((row as any)[col.key])}
@@ -252,7 +252,7 @@ export const CoreTable = <T extends { id: number }>({
           {selection.mode === "page" &&
             selection.isPageAllSelected &&
             total > data.length && (
-              <div className="mt-2 text-sm text-muted-foreground px-4">
+              <div className="mt-2 text-sm text-muted-foreground px-4 shrink-0">
                 Selected {data.length} items.
                 <button
                   className="ml-2 underline"
@@ -264,7 +264,7 @@ export const CoreTable = <T extends { id: number }>({
             )}
 
           {/* Pagination */}
-          <div className="flex items-center justify-between border-t pt-4 mt-4 px-4">
+          <div className="flex items-center justify-between border-t pt-4 mt-4 px-4 shrink-0">
             <div className="text-sm text-muted-foreground">
               Showing {(page - 1) * limit + 1} to{" "}
               {Math.min(page * limit, total)} of {total} items

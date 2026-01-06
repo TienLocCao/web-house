@@ -1,8 +1,11 @@
 import { sql } from "@/lib/db"
 import { cookies } from "next/headers"
+import type { NextRequest } from "next/server"
 import { nanoid } from "nanoid"
-
-// Admin user type
+import { AUTH_CONFIG } from "./auth.config"
+/* =========================
+ * TYPES
+ * ========================= */
 export interface AdminUser {
   id: number
   email: string
@@ -11,110 +14,158 @@ export interface AdminUser {
   is_active: boolean
 }
 
-// Session type
-interface AdminSession {
-  id: number
-  admin_id: number
-  session_token: string
-  expires_at: Date
-}
+/* =========================
+ * CONSTANTS
+ * ========================= */
 
-// Session duration: 7 days
-const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000
+const { SESSION_DURATION,  IDLE_TIMEOUT_MINUTES } = AUTH_CONFIG
 
-/**
- * Create a new admin session
- */
-export async function createSession(adminId: number, ipAddress?: string, userAgent?: string): Promise<string> {
+/* =========================
+ * CREATE SESSION (Node only)
+ * ========================= */
+export async function createSession(
+  adminId: number,
+  ipAddress?: string,
+  userAgent?: string
+): Promise<string> {
   const sessionToken = nanoid(64)
   const expiresAt = new Date(Date.now() + SESSION_DURATION)
 
-  await sql
-    `
-    INSERT INTO admin_sessions (admin_id, session_token, expires_at, ip_address, user_agent)
-    VALUES (${adminId}, ${sessionToken}, ${expiresAt}, ${ipAddress || null}, ${userAgent || null})
+  await sql`
+    INSERT INTO admin_sessions (
+      admin_id,
+      session_token,
+      expires_at,
+      ip_address,
+      user_agent,
+      last_activity_at
+    )
+    VALUES (
+      ${adminId},
+      ${sessionToken},
+      ${expiresAt},
+      ${ipAddress || null},
+      ${userAgent || null},
+      NOW()
+    )
   `
+
   const isProd = process.env.NODE_ENV === "production"
-  // Set secure HTTP-only cookie
   const cookieStore = await cookies()
+
   cookieStore.set("admin_session", sessionToken, {
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? "none": "lax",
+    sameSite: isProd ? "none" : "lax",
     expires: expiresAt,
-    // path: "/admin",
     path: "/",
   })
 
   return sessionToken
 }
 
-/**
- * Validate session and return admin user
- */
-export async function validateSession(): Promise<AdminUser | null> {
+/* =========================
+ * EDGE + API VALIDATION
+ * ========================= */
+export async function validateSessionFromRequest(
+  req: NextRequest
+): Promise<AdminUser | null> {
   try {
-    const cookieStore = await cookies()
-    const sessionToken = cookieStore.get("admin_session")?.value
-
-    if (!sessionToken) {
-      return null
-    }
-
-    // Get session with admin user data
+    const sessionToken = req.cookies.get("admin_session")?.value
+    if (!sessionToken) return null
+    
     const [session] = await sql`
-      SELECT s.*, u.email, u.name, u.role, u.is_active
+      SELECT
+        s.id,
+        s.admin_id,
+        u.email,
+        u.name,
+        u.role,
+        u.is_active
       FROM admin_sessions s
-      JOIN admin_users u ON s.admin_id = u.id
-      WHERE s.session_token = ${sessionToken} AND s.expires_at > NOW()
+      JOIN admin_users u ON u.id = s.admin_id
+      WHERE s.session_token = ${sessionToken}
+        AND s.expires_at > NOW()
+        AND s.last_activity_at > NOW() - (${IDLE_TIMEOUT_MINUTES} * INTERVAL '1 minute')
+
     `
 
-    if (!session) {
-      // Invalid or expired session
-      await destroySession()
-      return null
-    }
+    if (!session || !session.is_active) return null
 
-    const admin: AdminUser = {
+    await sql`
+      UPDATE admin_sessions
+      SET last_activity_at = NOW()
+      WHERE id = ${session.id}
+    `
+
+    return {
       id: session.admin_id,
-      email: (session as any).email,
-      name: (session as any).name,
-      role: (session as any).role,
-      is_active: (session as any).is_active,
+      email: session.email,
+      name: session.name,
+      role: session.role,
+      is_active: session.is_active,
     }
-
-    if (!admin.is_active) {
-      await destroySession()
-      return null
-    }
-
-    // Update last login
-    await sql`UPDATE admin_users SET last_login = NOW() WHERE id = ${admin.id}`
-
-    return admin
-  } catch (error) {
-    console.error("[v0] Session validation error:", error)
+  } catch (err) {
+    console.error("[validateSessionFromRequest]", err)
     return null
   }
 }
 
-/**
- * Destroy current session
- */
-export async function destroySession(): Promise<void> {
-  try {
-    const cookieStore = await cookies()
-    const sessionToken = cookieStore.get("admin_session")?.value
 
-    if (sessionToken) {
-      // Delete session from database
-      await sql`DELETE FROM admin_sessions WHERE session_token = ${sessionToken}`
-    }
+export async function validateSessionForLogin() {
+  const cookieStore = await cookies()
+  const token = cookieStore.get("admin_session")?.value
+  if (!token) return null
 
-    // Clear cookie
-    cookieStore.delete("admin_session")
-  } catch (error) {
-    console.error("[v0] Session destruction error:", error)
+  const [session] = await sql`
+    SELECT 1
+    FROM admin_sessions
+    WHERE session_token = ${token}
+      AND expires_at > NOW()
+      AND last_activity_at > NOW() - (${IDLE_TIMEOUT_MINUTES} * INTERVAL '1 minute')
+  `
+
+  return session ?? null
+}
+
+/* =========================
+ * SERVER COMPONENT VALIDATION
+ * ========================= */
+export async function validateSession(): Promise<AdminUser | null> {
+  const cookieStore = await cookies()
+  const token = cookieStore.get("admin_session")?.value
+  if (!token) return null
+
+  const [session] = await sql`
+    SELECT
+      s.id,
+      s.admin_id,
+      u.email,
+      u.name,
+      u.role,
+      u.is_active
+    FROM admin_sessions s
+    JOIN admin_users u ON u.id = s.admin_id
+    WHERE s.session_token = ${token}
+      AND s.expires_at > NOW()
+      AND s.last_activity_at > NOW() - (${IDLE_TIMEOUT_MINUTES} * INTERVAL '1 minute')
+  `
+
+  if (!session || !session.is_active) return null
+
+  // ✅ CHỈ UPDATE KHI THỰC SỰ DÙNG HỆ THỐNG
+  await sql`
+    UPDATE admin_sessions
+    SET last_activity_at = NOW()
+    WHERE id = ${session.id}
+  `
+
+  return {
+    id: session.admin_id,
+    email: session.email,
+    name: session.name,
+    role: session.role,
+    is_active: session.is_active,
   }
 }
 
@@ -154,28 +205,42 @@ export async function refreshSession(): Promise<boolean> {
   }
 }
 
-/**
- * Clean up expired sessions (call this periodically)
- */
-export async function cleanupExpiredSessions(): Promise<void> {
-  await sql`DELETE FROM admin_sessions WHERE expires_at < NOW()`
+/* =========================
+ * DESTROY SESSION
+ * ========================= */
+export async function destroySession(): Promise<void> {
+  try {
+    const cookieStore = await cookies()
+    const sessionToken = cookieStore.get("admin_session")?.value
+
+    if (sessionToken) {
+      await sql`
+        DELETE FROM admin_sessions
+        WHERE session_token = ${sessionToken}
+      `
+    }
+
+    cookieStore.delete("admin_session")
+  } catch (err) {
+    console.error("[destroySession]", err)
+  }
 }
 
-/**
- * Require admin authentication - use in Server Components
- */
+/* =========================
+ * REQUIRE AUTH / ROLE
+ * ========================= */
 export async function requireAuth(): Promise<AdminUser> {
   const admin = await validateSession()
-  if (!admin) {
-    throw new Error("Unauthorized")
-  }
-
+  if (!admin) throw new Error("Unauthorized")
   return admin
 }
 
-/**
- * Check if user has required role
- */
-export function hasRole(admin: AdminUser, allowedRoles: string[]): boolean {
-  return allowedRoles.includes(admin.role)
+export function requireRole(admin: AdminUser, roles: string[]) {
+  if (!roles.includes(admin.role)) {
+    throw new Error("Forbidden")
+  }
+}
+
+export function hasRole(admin: AdminUser, roles: string[]) {
+  return roles.includes(admin.role)
 }

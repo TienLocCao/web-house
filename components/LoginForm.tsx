@@ -20,13 +20,14 @@ export function LoginForm() {
     setLoading(true)
 
     try {
+      console.log("Submitting login for:", email)
       const response = await fetch("/api/admin/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       })
-
       const data = await response.json()
+      console.log("datadatadatadata", data)
 
       if (!response.ok) {
         setError(data.error || "Login failed")
