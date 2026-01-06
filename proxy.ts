@@ -8,7 +8,6 @@ export async function proxy(request: NextRequest) {
   /* =========================
    * 1. AUTH GUARD cho admin API
    * ========================= */
-  console.log("Middleware request pathname:", pathname)
   if (pathname.startsWith("/api/admin") && !pathname.startsWith("/api/admin/auth")) {
     const admin = await validateSessionFromRequest(request)
     if (!admin) {

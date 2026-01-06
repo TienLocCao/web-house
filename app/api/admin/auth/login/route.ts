@@ -92,5 +92,4 @@ export async function POST(request: NextRequest) {
 //     SET password_hash = EXCLUDED.password_hash
 //   `;
 
-//   console.log("Admin created/updated successfully!");
 // }

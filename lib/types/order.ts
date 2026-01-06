@@ -9,3 +9,11 @@ export interface Order {
   item_count: number
   created_at: string
 }
+
+export type ShippingAddress = {
+  street: string
+  city: string
+  state: string
+  zip: string
+  country: string
+}

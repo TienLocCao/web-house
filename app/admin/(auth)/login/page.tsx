@@ -11,11 +11,9 @@ export const metadata: Metadata = {
 export default async function AdminLoginPage() {
   // Redirect if already logged in
   const session  = await validateSessionForLogin()
-  console.log("AdminLoginPage session:", session)
   if (session) {
     redirect("/admin")
   }
-  console.log("continue")
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 px-4">

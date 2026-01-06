@@ -29,8 +29,6 @@ export const GET = (req: NextRequest) =>
     if (search) filter.name = search
     if (roomType) filter.room_type = roomType
 
-    console.log("[admin/products.GET]", admin.email)
-
     const result = await getProducts({ page, limit, sort, filter })
     return NextResponse.json(result)
   })

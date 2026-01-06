@@ -111,7 +111,6 @@ export function ProductsTable({
 
   /* ---------------- bulk delete ---------------- */
   const deleteMany = async (ids: number[], mode: string) => {
-    console.log("delete ids", ids, mode)
     if (ids.length === 0 && mode !== "all") return
     const LEN = mode === "all" ? total : ids.length
     
