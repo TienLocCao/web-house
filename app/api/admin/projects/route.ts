@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getProjects } from "@/lib/services/projects"
 import { sql } from "@/lib/db"
-import { withAdminAuth } from "@/lib/admin-api"
+import { withAdminAuth } from "@/lib/middleware"
 import { ProjectCreateSchema } from "@/lib/schemas/project.schema"
 import { z } from "zod"
 

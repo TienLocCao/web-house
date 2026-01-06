@@ -1,4 +1,5 @@
 "use client"
+
 import useSWR from "swr"
 import type { Product } from "@/lib/db"
 import useSWRInfinite from "swr/infinite"
@@ -76,6 +77,7 @@ export function useProducts(options: UseProductsOptions = {}) {
     loadMore: () => setSize(size + 1),
   }
 }
+
 export function useProduct(slug: string) {
   const { data, error, isLoading } = useSWR<{
     product: Product

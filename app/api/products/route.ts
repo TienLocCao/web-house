@@ -1,8 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { ProductQuerySchema } from "@/lib/validation"
-import { rateLimit } from "@/lib/rate-limit"
-import { getClientIP } from "@/lib/request"
+import { ProductQuerySchema, rateLimit, getClientIP } from "@/lib/utils"
 
 /**
  * ⚠️ CHỈ để edge nếu DB dùng HTTP driver (Neon / Turso / PlanetScale)

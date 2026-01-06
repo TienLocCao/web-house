@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import path from "path"
 import fs from "fs/promises"
 import crypto from "crypto"
-import { withAdminAuth } from "@/lib/admin-api"
-import { deleteImageByUrl } from "@/lib/fs"
+import { withAdminAuth } from "@/lib/middleware"
+import { deleteImageByUrl } from "@/lib/server/file-system"
 
 export const runtime = "nodejs"
 

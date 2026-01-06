@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { withAdminAuth } from "@/lib/admin-api"
+import { withAdminAuth } from "@/lib/middleware"
 
 export const runtime = "edge"
 

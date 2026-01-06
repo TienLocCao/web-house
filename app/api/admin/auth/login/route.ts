@@ -1,10 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { rateLimit } from "@/lib/rate-limit"
+import { rateLimit, getClientIP } from "@/lib/middleware"
 import { createSession } from "@/lib/auth"
 import { z } from "zod"
 import bcrypt from "bcryptjs"
-import { getClientIP } from "@/lib/request"
 
 export const runtime = "nodejs"
 

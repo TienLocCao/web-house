@@ -2,7 +2,7 @@
 
 import { useRef } from "react"
 import { RoomCard } from "@/components/RoomCard"
-import { useProducts } from "@/lib/useProducts"
+import { useProducts } from "@/lib/hooks"
 import type { Product } from "@/lib/types/product"
 import { useAnimateOnInView } from "@/hooks/useAnimateOnInView"
 

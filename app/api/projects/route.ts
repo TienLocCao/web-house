@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { rateLimit } from "@/lib/rate-limit"
-import { getClientIP } from "@/lib/request"
+import { rateLimit, getClientIP } from "@/lib/middleware"
 
 export const runtime = "edge"
 export const dynamic = "force-dynamic"

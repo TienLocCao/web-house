@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getContacts } from "@/lib/services/contacts"
-import { withAdminAuth } from "@/lib/admin-api"
+import { withAdminAuth } from "@/lib/middleware"
 
 export const runtime = "edge"
 

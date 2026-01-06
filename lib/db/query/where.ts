@@ -1,4 +1,4 @@
-import { sql } from "@/lib/db"
+import { sql } from "@/lib/db/client"
 
 export function buildWhere(
   filter: Record<string, any>,

@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from "react"
 import { Header } from "@/components/layout/Header"
 import { Footer } from "@/components/layout/Footer"
 import { ProductCard } from "@/components/ProductCard"
-import { useProducts } from "@/lib/useProducts"
+import { useProducts } from "@/lib/hooks"
 import { Input } from "@/components/ui/input"
 import {
   Select,
