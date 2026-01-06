@@ -1,15 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { requireAuth } from "@/lib/auth"
+import { withAdminAuth } from "@/lib/admin-api"
 
 export const runtime = "edge"
 
 // DELETE /api/admin/reviews/[id]
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    await requireAuth()
-
-    const reviewId = Number.parseInt(params.id)
+  return withAdminAuth(request, async (admin) => {
+    try {
+      const reviewId = Number.parseInt(params.id)
 
     // Get product_id before deleting
     const [review] = await sql`SELECT product_id FROM reviews WHERE id = ${reviewId}`
@@ -25,9 +24,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       await sql`UPDATE products SET rating = ${stats.avg_rating || 0}, review_count = ${stats.count || 0} WHERE id = ${review.product_id}`
     }
 
-    return NextResponse.json({ message: "Review deleted successfully" })
-  } catch (error) {
-    console.error("[v0] Delete review error:", error)
-    return NextResponse.json({ error: "Failed to delete review" }, { status: 500 })
-  }
+      return NextResponse.json({ message: "Review deleted successfully" })
+    } catch (error) {
+      console.error("[v0] Delete review error:", error)
+      return NextResponse.json({ error: "Failed to delete review" }, { status: 500 })
+    }
+  })
 }

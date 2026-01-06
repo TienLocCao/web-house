@@ -41,7 +41,7 @@ export const GET = (req: NextRequest) =>
 export const POST = (req: NextRequest) =>
   withAdminAuth(req, async (admin) => {
     // 🔐 role check
-    if (admin.role !== "super_admin") {
+    if (!["super_admin", "admin"].includes(admin.role)) {
       return NextResponse.json(
         { message: "Forbidden" },
         { status: 403 }

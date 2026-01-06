@@ -26,3 +26,4 @@ export const CONTACT_STATUS_OPTIONS = [
   { value: "resolved", label: "Resolved" },
   { value: "closed", label: "Closed" },
 ] as const
+

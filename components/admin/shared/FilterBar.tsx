@@ -42,3 +42,4 @@ export function FilterBar({
     </div>
   )
 }
+

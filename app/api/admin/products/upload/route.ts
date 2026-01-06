@@ -1,16 +1,21 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import fs from "fs/promises"
 import path from "path"
 import crypto from "crypto"
-import { requireAuth } from "@/lib/auth"
+import { withAdminAuth } from "@/lib/admin-api"
 
 export const runtime = "nodejs"
 
-export async function POST(req: Request) {
-  try {
-    await requireAuth()
-
-    const form = await req.formData()
+export const POST = (req: NextRequest) =>
+  withAdminAuth(req, async (admin) => {
+    if (!["super_admin", "admin"].includes(admin.role)) {
+      return NextResponse.json(
+        { message: "Forbidden" },
+        { status: 403 }
+      )
+    }
+    try {
+      const form = await req.formData()
     const file = form.get("image") as File | null
     const oldImageUrl = form.get("old_image_url") as string | null
 
@@ -58,12 +63,12 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json(
-      { image_url: `/uploads/products/${fileName}` },
-      { status: 201 }
-    )
-  } catch (err) {
-    console.error(err)
-    return NextResponse.json({ message: "Upload failed" }, { status: 500 })
-  }
-}
+      return NextResponse.json(
+        { image_url: `/uploads/products/${fileName}` },
+        { status: 201 }
+      )
+    } catch (err) {
+      console.error(err)
+      return NextResponse.json({ message: "Upload failed" }, { status: 500 })
+    }
+  })
