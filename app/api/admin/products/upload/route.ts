@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import fs from "fs/promises"
 import path from "path"
 import crypto from "crypto"
-import { withAdminAuth } from "@/lib/admin-api"
+import { withAdminAuth } from "@/lib/middleware"
 
 export const runtime = "nodejs"
 

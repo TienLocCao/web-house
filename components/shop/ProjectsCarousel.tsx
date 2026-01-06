@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Project } from "@/lib/types/project"
-import { AppImage } from "./ui/app-image"
+import { AppImage } from "../ui/app-image"
 
 type Props = {
   initialProjects: Project[]

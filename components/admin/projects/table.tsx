@@ -80,7 +80,6 @@ export function ProjectsTable({ initialData, initialTotal, onEdit, onDelete, ref
     await fetch("/api/admin/projects/bulk-delete", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids, mode }) })
     setPage(1)
   }
-  console.log({columns,data})
   return (
     <CoreTable columns={columns} data={data} total={total} page={page} limit={limit} sort={sort} isLoading={loading} onPageChange={setPage} onSortChange={setSort} onEdit={onEdit} onDelete={onDelete} renderBulkActionBar={(s) => s.mode !== "none" ? (
       <div className="flex items-center gap-3">

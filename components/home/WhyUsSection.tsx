@@ -2,7 +2,7 @@
 
 import { useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { AppImage } from "./ui/app-image"
+import { AppImage } from "../ui/app-image"
 import { useAnimateOnInView } from "@/hooks/useAnimateOnInView"
 
 export function WhyUsSection() {

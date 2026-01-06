@@ -1,8 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { ContactFormSchema, sanitizeInput } from "@/lib/validation"
-import { rateLimit } from "@/lib/rate-limit"
-import { getClientIP } from "@/lib/request"
+import { ContactFormSchema, sanitizeInput } from "@/lib/utils"
+import { rateLimit, getClientIP } from "@/lib/middleware"
 
 export const runtime = "edge"
 

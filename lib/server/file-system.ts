@@ -1,7 +1,10 @@
 import fs from "fs/promises"
 import path from "path"
 
-export async function deleteImageByUrl(imageUrl?: string | null) {
+/**
+ * Delete image file by URL
+ */
+export async function deleteImageByUrl(imageUrl?: string | null): Promise<void> {
   if (!imageUrl) return
 
   if (!imageUrl.startsWith("/uploads/")) return

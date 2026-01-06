@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { withAdminAuth } from "@/lib/admin-api"
+import { withAdminAuth } from "@/lib/middleware"
 import { getProducts } from "@/lib/services/products"
 import { ProductCreateSchema } from "@/lib/schemas/product.schema"
 import { z } from "zod"
@@ -28,8 +28,6 @@ export const GET = (req: NextRequest) =>
 
     if (search) filter.name = search
     if (roomType) filter.room_type = roomType
-
-    console.log("[admin/products.GET]", admin.email)
 
     const result = await getProducts({ page, limit, sort, filter })
     return NextResponse.json(result)

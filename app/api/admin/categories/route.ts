@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getCategories } from "@/lib/services/categories"
 import { sql } from "@/lib/db"
-import { withAdminAuth } from "@/lib/admin-api"
+import { withAdminAuth } from "@/lib/middleware"
 import { CategoryCreateSchema } from "@/lib/schemas/category.schema"
 import { z } from "zod"
 

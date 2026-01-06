@@ -6,5 +6,3 @@ export const AUTH_CONFIG = {
   IDLE_TIMEOUT_MINUTES:
     Number(process.env.ADMIN_IDLE_TIMEOUT_MINUTES ?? 1440),
 }
-
-console.log("[AUTH CONFIG]", AUTH_CONFIG)

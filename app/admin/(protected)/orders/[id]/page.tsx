@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ArrowLeft, Package, User, MapPin, CreditCard } from "lucide-react"
 import { getOrderById, getOrderItems } from "@/lib/services/orders"
-
+import  type { ShippingAddress } from "@/lib/types/order"
 export const metadata: Metadata = {
   title: "Order Details | Admin",
   description: "View order details",
@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic"
 
 export default async function AdminOrderDetailPage({ params }: { params: { id: string } }) {
-  const orderId = Number.parseInt(params.id)
+  const data = await params;
+  const orderId = Number.parseInt(data.id)
 
   const order = await getOrderById(orderId)
 
@@ -21,7 +22,15 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
 
   const orderItems = await getOrderItems(orderId)
 
-  const shippingAddress = order.shipping_address
+  let shippingAddress: ShippingAddress | null = null
+
+  try {
+    if (order.shipping_address) {
+      shippingAddress = JSON.parse(order.shipping_address) as ShippingAddress
+    }
+  } catch (err) {
+    console.error("Invalid shipping_address JSON", err)
+  }
 
   const statusColors: Record<string, string> = {
     pending: "bg-yellow-100 text-yellow-800",
@@ -122,11 +131,15 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
             </div>
 
             <div className="space-y-1 text-sm text-neutral-700">
-              <p>{shippingAddress.street}</p>
-              <p>
-                {shippingAddress.city}, {shippingAddress.state} {shippingAddress.zip}
-              </p>
-              <p>{shippingAddress.country}</p>
+              {shippingAddress && (
+                <>
+                  <p>{shippingAddress?.street}</p>
+                  <p>
+                    {shippingAddress?.city}, {shippingAddress?.state} {shippingAddress?.zip}
+                  </p>
+                  <p>{shippingAddress?.country}</p>
+                </>
+              )}
             </div>
           </div>
 

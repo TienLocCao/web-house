@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { withAdminAuth } from "@/lib/admin-api"
+import { withAdminAuth } from "@/lib/middleware"
 import { ProjectUpdateSchema } from "@/lib/schemas/project.schema"
 import { z } from "zod"
-import { deleteImageByUrl } from "@/lib/fs"
+import { deleteImageByUrl } from "@/lib/server/file-system"
 
 export const runtime = "nodejs"
 

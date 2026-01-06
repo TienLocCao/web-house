@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { sql } from "@/lib/db"
-import { ReviewsTable } from "@/components/ReviewsTable"
+import { ReviewsTable } from "@/components/admin/reviews/ReviewsTable"
 import { getReviews } from "@/lib/services/reviews"
 export const metadata: Metadata = {
   title: "Reviews | Admin",

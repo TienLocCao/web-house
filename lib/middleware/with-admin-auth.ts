@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server"
 import { validateSessionFromRequest } from "@/lib/auth"
 import type { AdminUser } from "@/lib/auth"
 
+/**
+ * Middleware wrapper for admin authentication
+ * Validates admin session and passes admin user to handler
+ */
 export async function withAdminAuth<T>(
   req: NextRequest,
   handler: (admin: AdminUser) => Promise<T>
