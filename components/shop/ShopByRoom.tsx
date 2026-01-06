@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef } from "react"
-import { RoomCard } from "@/components/RoomCard"
+import { RoomCard } from "@/components/shop/RoomCard"
 import { useProducts } from "@/lib/hooks"
 import type { Product } from "@/lib/types/product"
 import { useAnimateOnInView } from "@/hooks/useAnimateOnInView"

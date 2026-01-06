@@ -1,8 +1,8 @@
 import { Header } from "@/components/layout/Header"
-import { HeroSection } from "@/components/HeroSection"
-import { WhyUsSection } from "@/components/WhyUsSection"
-import { ShopByRoom } from "@/components/ShopByRoom"
-import ProjectsSection from "@/components/ProjectsSection"
+import { HeroSection } from "@/components/home/HeroSection"
+import { WhyUsSection } from "@/components/home/WhyUsSection"
+import { ShopByRoom } from "@/components/shop/ShopByRoom"
+import ProjectsSection from "@/components/home/ProjectsSection"
 import { Footer } from "@/components/layout/Footer"
 
 import { getProducts } from "@/lib/services/products"

@@ -14,6 +14,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={`/products/${product.slug}`} className="group">
+      xxxxxxxxxxxxxx
       <div className="relative aspect-square rounded-lg overflow-hidden bg-muted mb-3">
         <Image
           src={product.image_url || "/placeholder.svg"}

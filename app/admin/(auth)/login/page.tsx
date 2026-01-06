@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { LoginForm } from "@/components/LoginForm"
+import { LoginForm } from "@/components/auth/LoginForm"
 import { validateSessionForLogin } from "@/lib/auth"
 import { redirect } from "next/navigation"
 

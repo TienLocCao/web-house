@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic"
 
 export default async function AdminOrderDetailPage({ params }: { params: { id: string } }) {
-  const orderId = Number.parseInt(params.id)
+  const data = await params;
+  const orderId = Number.parseInt(data.id)
 
   const order = await getOrderById(orderId)
 

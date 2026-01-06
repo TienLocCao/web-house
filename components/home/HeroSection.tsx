@@ -3,7 +3,7 @@
 import { useRef } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { StatsDisplay } from "@/components/StatsDisplay"
+import { StatsDisplay } from "@/components/admin/dashboard/starts/StatsDisplay"
 import type { Stats } from "@/lib/types/stats"
 import { AppImage } from "@/components/ui/app-image"
 import { useAnimateOnInView } from "@/hooks/useAnimateOnInView"
