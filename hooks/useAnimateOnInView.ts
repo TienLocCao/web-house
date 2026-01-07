@@ -20,7 +20,14 @@ export function useAnimateOnInView(
           if (!entry.isIntersecting) return
 
           const el = entry.target as HTMLElement
-          el.classList.add("animate-fade-in-up")
+          const animateClass = el.dataset.animate || 'animate-fade-in-up'
+          if (animateClass) {
+            el.classList.add(animateClass)
+          }
+          const delay = el.dataset.delay
+          if (delay) {
+            el.style.animationDelay = `${delay}ms`
+          }
           observer.unobserve(entry.target)
         })
       },

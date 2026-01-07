@@ -30,9 +30,11 @@ export function RoomCard({
     <Link href={href}>
       <div
         ref={cardRef}
-        className={`group observe-animate flex flex-col md:flex-row gap-12 items-center
+        className={`group observe-animate opacity-0 flex flex-col md:flex-row gap-12 items-center
           ${isReverse ? "md:flex-row-reverse md:translate-y-16" : ""}
         `}
+        data-animate={`${isReverse ? "animate-fade-in-right" : "animate-fade-in-left"}`}
+        data-delay={`${index * 200}`}
         style={{ animationDelay: delay }}
       >
         {/* IMAGE */}

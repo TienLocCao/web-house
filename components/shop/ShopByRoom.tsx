@@ -37,9 +37,9 @@ export function ShopByRoom() {
   ].filter(room => Boolean(room.title))
 
   return (
-    <section id="categories" ref={sectionRef} className="py-24">
+    <section id="categories" ref={sectionRef} className="py-24 overflow-hidden">
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="text-center mb-16 observe-animate opacity-0">
+        <div className="text-center mb-16 observe-animate opacity-0" data-animate="animate-fade-in-up">
           <h2 className="text-4xl lg:text-5xl font-serif font-bold mb-4">Shop By Room</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Discover furniture and decor perfectly curated for every space in your home. From living rooms to bedrooms,

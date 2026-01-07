@@ -5,7 +5,7 @@ import { getProjects } from "@/lib/services/projects"
 import { useAnimateOnInView } from "@/hooks/useAnimateOnInView"
 import ProjectsCarousel from "../shop/ProjectsCarousel"
 
-export default async function ProjectsSection({ initialProjects }: { initialProjects?: Project[] }) {
+export default function ProjectsSection({ initialProjects }: { initialProjects?: Project[] }) {
   const sectionRef = useRef<HTMLDivElement | null>(null)
   useAnimateOnInView(sectionRef, { threshold: 0.1 })
 
