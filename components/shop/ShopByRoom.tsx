@@ -12,32 +12,39 @@ export function ShopByRoom({ initialProductsByRoom }: { initialProductsByRoom?: 
   const { products: livingRoomProducts } = useProducts({ room_type: "living_room", limit: 1 })
   const { products: diningRoomProducts } = useProducts({ room_type: "dining_room", limit: 1 })
   const { products: bedroomProducts } = useProducts({ room_type: "bedroom", limit: 1 })
-
+  console.log('livingRoomProducts:', livingRoomProducts);
+  console.log('diningRoomProducts:', diningRoomProducts);
+  console.log('bedroomProducts:', bedroomProducts);
   useAnimateOnInView(sectionRef, { threshold: 0.1 })
 
   const rooms = [
     {
-      title: livingRoomProducts[0]?.name || "Living Room",
+      title: livingRoomProducts[0]?.name,
       description: livingRoomProducts[0]?.description,
       imageUrl:
-        livingRoomProducts[0]?.image_url || initialProductsByRoom?.living_room?.[0]?.image_url,
+        livingRoomProducts[0]?.image_url,
       href: "/products?room_type=living_room",
     },
     {
-      title: diningRoomProducts[0]?.name || "Dining Room",
+      title: diningRoomProducts[0]?.name,
       description: diningRoomProducts[0]?.description,
       imageUrl:
-        diningRoomProducts[0]?.image_url || initialProductsByRoom?.dining_room?.[0]?.image_url,
+        diningRoomProducts[0]?.image_url,
       href: "/products?room_type=dining_room",
     },
     {
-      title: bedroomProducts[0]?.name || "Bedroom",
+      title: bedroomProducts[0]?.name,
       description: bedroomProducts[0]?.description,
       imageUrl:
-        bedroomProducts[0]?.image_url || initialProductsByRoom?.bedroom?.[0]?.image_url,
+        bedroomProducts[0]?.image_url,
       href: "/products?room_type=bedroom",
     },
-  ]
+  ].filter(room => Boolean(room.title))
+  
+  if (rooms.length === 0) {
+    return null
+  }
+
 
   return (
     <section id="categories" ref={sectionRef} className="py-24">

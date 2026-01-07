@@ -14,8 +14,7 @@ export const revalidate = 60
 
 export default async function HomePage() {
   // Fetch small datasets server-side to hydrate client components
-  const [productsResult, projectsResult, productsCountRes, projectsCountRes, reviewsCountRes, ordersCountRes] = await Promise.all([
-    getProducts({ limit: 6, filter: { is_available: true } }),
+  const [projectsResult, productsCountRes, projectsCountRes, reviewsCountRes, ordersCountRes] = await Promise.all([
     getProjects({ limit: 6, filter: {} }),
     sql`SELECT COUNT(*)::int AS count FROM products WHERE is_available = true`,
     sql`SELECT COUNT(*)::int AS count FROM projects WHERE status = 'completed'`,
@@ -23,7 +22,6 @@ export default async function HomePage() {
     sql`SELECT COUNT(*)::int AS count FROM orders`,
   ])
 
-  const initialProducts: Product[] = productsResult.items || []
   const initialProjects = projectsResult.items || []
 
   const stats = {
@@ -40,13 +38,7 @@ export default async function HomePage() {
       <Header />
       <HeroSection initialStats={stats} />
       <WhyUsSection />
-      <ShopByRoom
-        initialProductsByRoom={{
-          living_room: initialProducts.filter((p: Product) => p.room_type === "living_room"),
-          dining_room: initialProducts.filter((p: Product) => p.room_type === "dining_room"),
-          bedroom: initialProducts.filter((p: Product) => p.room_type === "bedroom"),
-        }}
-      />
+      <ShopByRoom/>
       <ProjectsSection initialProjects={initialProjects} />
       <Footer />
     </main>

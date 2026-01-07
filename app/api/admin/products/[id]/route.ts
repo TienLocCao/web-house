@@ -24,7 +24,6 @@ export async function PATCH(
 
       const body = await request.json();
       const validated = ProductUpdateSchema.parse(body);
-      validated.room_type = "living_room";
 
       // If slug is being changed, make sure it's unique (not belonging to another product)
       if (validated.slug) {
