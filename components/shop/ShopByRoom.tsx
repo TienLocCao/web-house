@@ -3,20 +3,15 @@
 import { useRef } from "react"
 import { RoomCard } from "@/components/shop/RoomCard"
 import { useProducts } from "@/lib/hooks"
-import type { Product } from "@/lib/types/product"
 import { useAnimateOnInView } from "@/hooks/useAnimateOnInView"
 
-export function ShopByRoom({ initialProductsByRoom }: { initialProductsByRoom?: { living_room?: Product[]; dining_room?: Product[]; bedroom?: Product[] } }) {
+export function ShopByRoom() {
   const sectionRef = useRef<HTMLDivElement>(null)
 
   const { products: livingRoomProducts } = useProducts({ room_type: "living_room", limit: 1 })
   const { products: diningRoomProducts } = useProducts({ room_type: "dining_room", limit: 1 })
   const { products: bedroomProducts } = useProducts({ room_type: "bedroom", limit: 1 })
-  console.log('livingRoomProducts:', livingRoomProducts);
-  console.log('diningRoomProducts:', diningRoomProducts);
-  console.log('bedroomProducts:', bedroomProducts);
   useAnimateOnInView(sectionRef, { threshold: 0.1 })
-
   const rooms = [
     {
       title: livingRoomProducts[0]?.name,
@@ -40,11 +35,6 @@ export function ShopByRoom({ initialProductsByRoom }: { initialProductsByRoom?: 
       href: "/products?room_type=bedroom",
     },
   ].filter(room => Boolean(room.title))
-  
-  if (rooms.length === 0) {
-    return null
-  }
-
 
   return (
     <section id="categories" ref={sectionRef} className="py-24">

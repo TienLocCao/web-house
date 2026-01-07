@@ -30,7 +30,7 @@ export function RoomCard({
     <Link href={href}>
       <div
         ref={cardRef}
-        className={`group observe-animate flex flex-col md:flex-row gap-8 items-center
+        className={`group observe-animate flex flex-col md:flex-row gap-12 items-center
           ${isReverse ? "md:flex-row-reverse md:translate-y-16" : ""}
         `}
         style={{ animationDelay: delay }}

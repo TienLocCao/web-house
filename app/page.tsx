@@ -5,10 +5,8 @@ import { ShopByRoom } from "@/components/shop/ShopByRoom"
 import ProjectsSection from "@/components/home/ProjectsSection"
 import { Footer } from "@/components/layout/Footer"
 
-import { getProducts } from "@/lib/services/products"
 import { getProjects } from "@/lib/services/projects"
 import { sql } from "@/lib/db"
-import type { Product } from "@/lib/types/product"
 
 export const revalidate = 60
 

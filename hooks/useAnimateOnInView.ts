@@ -7,30 +7,36 @@ export function useAnimateOnInView(
   deps: any[] = [],
 ) {
   useEffect(() => {
-    const root = containerRef?.current
-    if (!root) return
+    if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
+      return
+    }
+
+    const container = containerRef.current
+    if (!container) return
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const el = entry.target as HTMLElement
-            el.classList.add("animate-fade-in-up")
-            observer.unobserve(entry.target)
-          }
+          if (!entry.isIntersecting) return
+
+          const el = entry.target as HTMLElement
+          el.classList.add("animate-fade-in-up")
+          observer.unobserve(entry.target)
         })
       },
-      options ?? { threshold: 0.1 },
+      {
+        threshold: 0.1,
+        ...options,
+      },
     )
 
-    const elements = root.querySelectorAll(".observe-animate")
+    const elements = container.querySelectorAll(".observe-animate")
     elements.forEach((el) => observer.observe(el))
-    // If the root itself should animate (has the class), observe it too
-    if ((root as HTMLElement).classList.contains("observe-animate")) {
-      observer.observe(root)
+
+    if (container.classList.contains("observe-animate")) {
+      observer.observe(container)
     }
 
     return () => observer.disconnect()
-    // containerRef itself is stable; allow caller to pass additional deps
-  }, [containerRef, ...(deps || [])])
+  }, [...deps])
 }
