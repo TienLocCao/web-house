@@ -130,10 +130,24 @@
 }
 
 /* Custom animations for interior design website */
-@keyframes fadeInUp {
+
+/* ================================
+   THEME (Tailwind v4.1)
+================================ */
+@theme {
+  --animate-fade-in-up: fade-in-up 0.7s cubic-bezier(.16,1,.3,1) both;
+  --animate-fade-in-scale: fade-in-scale 0.6s ease-out both;
+  --animate-fade-in-left: fade-in-left 0.7s ease-out both;
+  --animate-fade-in-right: fade-in-right 0.7s ease-out both;
+}
+
+/* ================================
+   KEYFRAMES
+================================ */
+@keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(24px);
   }
   to {
     opacity: 1;
@@ -141,19 +155,10 @@
   }
 }
 
-@keyframes fadeIn {
+@keyframes fade-in-scale {
   from {
     opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.96);
   }
   to {
     opacity: 1;
@@ -161,14 +166,68 @@
   }
 }
 
+@keyframes fade-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-100vw);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(100vw);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 .animate-fade-in-up {
-  animation: fadeInUp 0.8s ease-out forwards;
+  animation: fade-in-up 0.7s ease-out forwards;
 }
 
-.animate-fade-in {
-  animation: fadeIn 1s ease-out forwards;
+@keyframes fade-in-right {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-fade-in-right {
+  animation: fade-in-right 0.8s ease-out forwards;
 }
 
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
 .animate-scale-in {
-  animation: scaleIn 0.6s ease-out forwards;
+  animation: scale-in 0.6s ease-out forwards;
+}
+
+@keyframes rotate-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px) rotateX(-15deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+}
+.animate-rotate-in-up {
+  animation: rotate-in-up 0.8s ease-out forwards;
+  transform-origin: bottom center;
+}
+
+.animate-text-base {
+  opacity: 0;
+  will-change: transform, opacity;
 }

@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Eye } from "lucide-react"
@@ -9,6 +8,14 @@ import { useToast } from "@/hooks/useToast"
 import { CoreTable } from "@/components/core/CoreTable"
 import type { Column, SortItem } from "@/lib/types/table"
 import type { Order } from "@/lib/types/order"
+
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select"
 
 interface OrdersTableProps {
   initialData: Order[]
@@ -26,7 +33,6 @@ const statusColors: Record<string, string> = {
 }
 
 export function OrdersTable({ initialData, initialTotal, search, status }: OrdersTableProps) {
-  const router = useRouter()
   const { toast } = useToast()
   const [data, setData] = useState<Order[]>(initialData)
   const [total, setTotal] = useState(initialTotal)
@@ -70,18 +76,25 @@ export function OrdersTable({ initialData, initialTotal, search, status }: Order
       header: "Status",
       sortable: true,
       render: (row) => (
-        <select
+        <Select
           value={row.status}
-          onChange={(e) => handleStatusChange(row.id, e.target.value)}
+          onValueChange={(value) => handleStatusChange(row.id, value)}
           disabled={updating === row.id}
-          className={`px-3 py-1 rounded-full text-xs font-medium border-0 cursor-pointer ${statusColors[row.status]}`}
         >
-          <option value="pending">Pending</option>
-          <option value="processing">Processing</option>
-          <option value="shipped">Shipped</option>
-          <option value="delivered">Delivered</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
+          <SelectTrigger
+            className={`h-7 px-3 text-xs font-medium rounded-full border-0 cursor-pointer ${statusColors[row.status]}`}
+          >
+            <SelectValue />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="processing">Processing</SelectItem>
+            <SelectItem value="shipped">Shipped</SelectItem>
+            <SelectItem value="delivered">Delivered</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
       ),
     },
     {

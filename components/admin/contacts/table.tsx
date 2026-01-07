@@ -1,11 +1,17 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Mail, Phone, Trash2 } from "lucide-react"
 import { useToast } from "@/hooks/useToast"
 import type { Contact } from "@/lib/types/contact"
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select"
 
 interface ContactsTableProps {
   initialData: Contact[]
@@ -22,7 +28,6 @@ const statusColors: Record<string, string> = {
 }
 
 export function ContactsTable({ initialData, initialTotal, search, status }: ContactsTableProps) {
-  const router = useRouter()
   const { toast } = useToast()
   const [data, setData] = useState<Contact[]>(initialData)
   const [total, setTotal] = useState(initialTotal)
@@ -76,6 +81,12 @@ export function ContactsTable({ initialData, initialTotal, search, status }: Con
   const handleStatusChange = async (contactId: number, newStatus: string) => {
     setUpdating(contactId)
 
+    setData(prev =>
+      prev.map(c =>
+        c.id === contactId ? { ...c, status: newStatus } : c
+      )
+    )
+
     try {
       const response = await fetch(`/api/admin/contacts/${contactId}/status`, {
         method: "PATCH",
@@ -83,31 +94,23 @@ export function ContactsTable({ initialData, initialTotal, search, status }: Con
         body: JSON.stringify({ status: newStatus }),
       })
 
-      if (response.ok) {
-        toast({ title: "Status updated", type: "success" })
-        // Refetch data
-        const params = new URLSearchParams()
-        params.set("page", String(page))
-        params.set("limit", String(limit))
-        if (search) params.set("search", search)
-        if (status) params.set("status", status)
-
-        const res = await fetch(`/api/admin/contacts?${params.toString()}`)
-        if (res.ok) {
-          const json: { items: Contact[]; total: number } = await res.json()
-          setData(json.items)
-        }
-      } else {
-        const json = await response.json().catch(() => null)
-        toast({ title: json?.error || "Failed to update status", type: "error" })
+      if (!response.ok) {
+        throw new Error("Failed to update status")
       }
+
+      toast({ title: "Status updated", type: "success" })
     } catch (error) {
-      console.error("Status update error:", error)
-      toast({ title: "An error occurred", type: "error" })
+      toast({ title: "Failed to update status", type: "error" })
+      setData((prev: any) =>
+        prev.map((c: any) =>
+          c.id === contactId ? { ...c, status } : c
+        )
+      )
     } finally {
       setUpdating(null)
     }
   }
+
 
   const handleDelete = async (contactId: number) => {
     if (!confirm("Are you sure you want to delete this inquiry?")) return
@@ -168,17 +171,24 @@ export function ContactsTable({ initialData, initialTotal, search, status }: Con
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       <p className="font-semibold text-neutral-900">{contact.name}</p>
-                      <select
+                      <Select
                         value={contact.status}
-                        onChange={(e) => handleStatusChange(contact.id, e.target.value)}
+                        onValueChange={(value) => handleStatusChange(contact.id, value)}
                         disabled={updating === contact.id}
-                        className={`px-3 py-1 rounded-full text-xs font-medium border-0 cursor-pointer ${statusColors[contact.status]}`}
                       >
-                        <option value="new">New</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="resolved">Resolved</option>
-                        <option value="closed">Closed</option>
-                      </select>
+                        <SelectTrigger
+                          className={`h-7 px-3 text-xs font-medium rounded-full border-0 ${statusColors[contact.status]}`}
+                        >
+                          <SelectValue />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                          <SelectItem value="new">New</SelectItem>
+                          <SelectItem value="in_progress">In Progress</SelectItem>
+                          <SelectItem value="resolved">Resolved</SelectItem>
+                          <SelectItem value="closed">Closed</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div className="flex items-center gap-4 mb-2 text-sm text-neutral-600">

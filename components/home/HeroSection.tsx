@@ -20,26 +20,27 @@ export function HeroSection({ initialStats }: HeroSectionProps) {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
-          <div className="space-y-8 observe-animate opacity-0">
+          <div className="space-y-8">
             <div className="space-y-4">
-              <h1 className="text-5xl lg:text-7xl font-serif font-bold text-balance leading-tight">HOUSE OF COMFORT</h1>
-              <p className="text-lg text-muted-foreground max-w-md">
+              <h1 className="text-5xl lg:text-7xl font-serif font-bold text-balance leading-tight observe-animate"   data-animate="animate-rotate-in-up"
+  data-delay="200">HOUSE OF COMFORT</h1>
+              <p className="text-lg text-muted-foreground max-w-md observe-animate animate-text-base" data-animate="animate-fade-in-up" data-delay="400">
                 Premium pieces designed to elevate your home with timeless elegance.
               </p>
             </div>
 
-            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 observe-animate " data-animate="animate-scale-in" data-delay="650">
               Read More
             </Button>
 
             {/* Statistics Grid */}
-            <div className="pt-8">
+            <div className="pt-8 observe-animate"  data-animate="animate-fade-in-up" data-delay="900">
               <StatsDisplay initialStats={initialStats} />
             </div>
           </div>
 
           {/* Right Content - Featured Product */}
-          <div className="relative observe-animate opacity-0" style={{ animationDelay: "0.2s" }}>
+          <div className="relative observe-animate opacity-0" data-animate="animate-fade-in-right" data-delay="500">
             <div className="relative aspect-square lg:aspect-[4/5] rounded-2xl overflow-hidden bg-muted">
               <AppImage
                 src="/uploads/home/modern-black-chair-with-wooden-legs.jpg"

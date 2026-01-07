@@ -7,6 +7,7 @@ export const runtime = "edge"
 // DELETE /api/admin/contacts/[id]
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   return withAdminAuth(request, async (admin) => {
+    params = await params;
     if (!["super_admin", "admin"].includes(admin.role)) {
       return NextResponse.json(
         { message: "Forbidden" },
