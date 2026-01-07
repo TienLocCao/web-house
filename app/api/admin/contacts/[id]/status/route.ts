@@ -7,6 +7,7 @@ export const runtime = "edge"
 // PATCH /api/admin/contacts/[id]/status - Update contact status
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   return withAdminAuth(request, async (admin) => {
+    params = await params;
     if (!["super_admin", "admin"].includes(admin.role)) {
       return NextResponse.json(
         { message: "Forbidden" },
