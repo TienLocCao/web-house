@@ -244,7 +244,7 @@ export default function ProductCreateEditDialog({
         <span />
       </DialogTrigger>
 
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-xl" side="right">
         <DialogHeader>
           <DialogTitle>
             {mode === "create" ? "Create Product" : "Edit Product"}
@@ -255,7 +255,7 @@ export default function ProductCreateEditDialog({
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid gap-4">
             <div>
-              <Label>Name</Label>
+              <Label className="pb-2">Name</Label>
               <Input
                 value={form.name}
                 onChange={(e) => updateField("name", e.target.value)}
@@ -264,7 +264,7 @@ export default function ProductCreateEditDialog({
             </div>
 
             <div>
-              <Label>Category</Label>
+              <Label className="pb-2">Category</Label>
               <Input
                 value={form.category_name}
                 onChange={(e) => updateField("category_name", e.target.value)}
@@ -273,7 +273,7 @@ export default function ProductCreateEditDialog({
             </div>
 
             <div>
-              <Label>Room Type</Label>
+              <Label className="pb-2">Room Type</Label>
               <Select
                 value={form.room_type}
                 onValueChange={(v) => updateField("room_type", v)}
@@ -303,7 +303,7 @@ export default function ProductCreateEditDialog({
             </div>
 
             <div>
-              <Label>Price</Label>
+              <Label className="pb-2">Price</Label>
               <Input
                 value={form.price}
                 onChange={(e) => updateField("price", e.target.value)}
@@ -311,7 +311,7 @@ export default function ProductCreateEditDialog({
             </div>
 
             <div>
-              <Label>Stock</Label>
+              <Label className="pb-2">Stock</Label>
               <Input
                 value={form.stock}
                 onChange={(e) => updateField("stock", e.target.value)}
@@ -359,7 +359,7 @@ export default function ProductCreateEditDialog({
           </div>
 
           <div>
-            <Label>Description</Label>
+            <Label className="pb-2">Description</Label>
             <Textarea
               value={form.description}
               onChange={(e) =>

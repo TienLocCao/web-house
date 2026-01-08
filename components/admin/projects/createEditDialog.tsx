@@ -216,7 +216,7 @@ export default function ProjectCreateEditDialog({
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid gap-4">
             <div>
-              <Label>Title</Label>
+              <Label className="pb-2">Title</Label>
               <Input
                 value={form.title}
                 onChange={(e) => updateField("title", e.target.value)}
@@ -224,7 +224,7 @@ export default function ProjectCreateEditDialog({
             </div>
 
             <div>
-              <Label>Client</Label>
+              <Label className="pb-2">Client</Label>
               <Input
                 value={form.client_name || ""}
                 onChange={(e) =>
@@ -242,7 +242,7 @@ export default function ProjectCreateEditDialog({
             />
 
             <div>
-              <Label>Room Type</Label>
+              <Label className="pb-2">Room Type</Label>
               <Select
                 value={form.room_type}
                 onValueChange={(v) => updateField("room_type", v)}
@@ -270,7 +270,7 @@ export default function ProjectCreateEditDialog({
           />
 
           <div>
-            <Label>Description</Label>
+            <Label className="pb-2">Description</Label>
             <Textarea
               value={form.description}
               onChange={(e) =>

@@ -3,29 +3,18 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import type { AdminUser } from "@/lib/auth"
-import { LayoutDashboard, Package, ShoppingCart, Star, MessageSquare, FolderOpen, Users, Settings, Menu } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { adminNavigation } from "@/config/admin-navigation"
+import type { adminNavigationType } from "@/config/admin-navigation"
+import { LayoutDashboard, Menu } from "lucide-react"
+
 interface AdminSidebarProps {
   admin: AdminUser
-  activePage: string
-  setActivePage: (page: string) => void
   isCollapsed: boolean
   setIsCollapsed: (collapsed: boolean) => void
 }
-
-const navigation = [
-  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { name: "Categories", href: "/admin/categories", icon: Package },
-  { name: "Products", href: "/admin/products", icon: Package },
-  { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
-  { name: "Reviews", href: "/admin/reviews", icon: Star },
-  { name: "Projects", href: "/admin/projects", icon: FolderOpen },
-  { name: "Contacts", href: "/admin/contacts", icon: MessageSquare },
-  { name: "Customers", href: "/admin/customers", icon: Users },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
-]
 
 function isActivePath(pathname: string, href: string) {
   if (href === "/admin") {
@@ -34,7 +23,7 @@ function isActivePath(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(href + "/")
 }
 
-export function AdminSidebar({ admin, activePage, setActivePage, isCollapsed, setIsCollapsed }: AdminSidebarProps) {
+export function AdminSidebar({ admin, isCollapsed, setIsCollapsed }: AdminSidebarProps) {
   const pathname = usePathname()
 
   return (
@@ -80,7 +69,7 @@ export function AdminSidebar({ admin, activePage, setActivePage, isCollapsed, se
         <TooltipProvider delayDuration={0}>
           <nav className="flex-1 space-y-1 p-4">
             
-            {navigation.map((item) => {
+            {adminNavigation.map((item: adminNavigationType) => {
               const Icon = item.icon
                 const isActive = isActivePath(pathname, item.href)
 

@@ -117,13 +117,13 @@ export default function CategoryCreateEditDialog({ mode = "create", category = n
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid grid-cols-1 gap-4">
             <div>
-              <Label>Name</Label>
+              <Label className="pb-2">Name</Label>
               <Input value={form.name} onChange={(e) => updateField("name", e.target.value)} />
               <FieldError errors={(fieldErrors.name || []).map((m) => ({ message: m }))} />
             </div>
 
             <div>
-              <Label>Slug</Label>
+              <Label className="pb-2">Slug</Label>
               <Input value={form.slug} onChange={(e) => updateField("slug", e.target.value)} />
               <FieldError errors={(fieldErrors.slug || []).map((m) => ({ message: m }))} />
             </div>
@@ -131,7 +131,7 @@ export default function CategoryCreateEditDialog({ mode = "create", category = n
             <ImageUploader value={previewUrl} onChange={(file, preview) => { setImageFile(file); setPreviewUrl(preview); setFieldErrors((p) => { const n = { ...p }; delete n.image; return n }) }} error={fieldErrors.image_url} />
 
             <div>
-              <Label>Description</Label>
+              <Label className="pb-2">Description</Label>
               <Textarea value={form.description} onChange={(e) => updateField("description", e.target.value)} />
             </div>
           </div>

@@ -14,7 +14,7 @@ export function ImageUploader({ value, onChange, error }: Props) {
 
   return (
     <div className="space-y-2">
-      <Label>Image</Label>
+      <Label className="pb-2">Image</Label>
 
       {/* Upload box */}
       <label
