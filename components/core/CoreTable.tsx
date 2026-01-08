@@ -123,7 +123,7 @@ export const CoreTable = <T extends { id: number }>({
               <TableHeader className="sticky z-30">
                 <TableRow className="sticky top-0 z-20 bg-background hover:bg-background">
                   {/* Checkbox column */}
-                  <TableHead className="left-0 bg-background z-30">
+                  <TableHead className="left-0 bg-background z-30 w-[40px]">
                     <Checkbox
                       checked={headerCheckboxState()}
                       onCheckedChange={(v) =>
@@ -167,7 +167,7 @@ export const CoreTable = <T extends { id: number }>({
                   })}
 
                   {/* Actions */}
-                  <TableHead className="text-right sticky right-0 bg-background z-10 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.1)]">
+                  <TableHead className="text-right sticky right-0 bg-background z-10 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.1)]  w-[70px]">
                     Actions
                   </TableHead>
                 </TableRow>
