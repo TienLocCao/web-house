@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { useActiveAdminPage } from "@/config/admin-navigation"
+
 interface AdminHeaderProps {
   admin: AdminUser
   isCollapsed: boolean
@@ -25,7 +27,7 @@ interface AdminHeaderProps {
 
 export function AdminHeader({ admin, isCollapsed }: AdminHeaderProps) {
   const router = useRouter()
-
+  const activePage = useActiveAdminPage()
   const handleLogout = async () => {
     try {
       await fetch("/api/admin/auth/logout", { method: "POST" })
@@ -37,22 +39,6 @@ export function AdminHeader({ admin, isCollapsed }: AdminHeaderProps) {
   }
 
   return (
-    // <header className="h-16 bg-white border-b border-neutral-200 flex items-center justify-between px-6">
-    //   <div className="flex items-center gap-4">
-    //     <Button variant="ghost" size="icon" className="lg:hidden">
-    //       <Menu className="w-5 h-5" />
-    //     </Button>
-    //   </div>
-
-    //   <div className="flex items-center gap-4">
-    //     <span className="text-sm text-neutral-600 hidden sm:inline">Welcome, {admin.name}</span>
-    //     <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2 bg-transparent">
-    //       <LogOut className="w-4 h-4" />
-    //       <span className="hidden sm:inline">Logout</span>
-    //     </Button>
-    //   </div>
-    // </header>
-
     <header className="flex h-[100px] items-center justify-between border-b border-border bg-card px-6 shadow-sm">
       {/* Search Bar */}
       <div className="flex flex-1 items-center gap-4">

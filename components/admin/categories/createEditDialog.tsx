@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { FieldError } from "@/components/ui/field"
 import { ImageUploader } from "@/components/admin/products/ImageUploader"
 import { uploadImage, deleteImage } from "@/lib/services/imageUpload"
+import { slugify } from '@/lib/utils/slugify'
 
 type FormState = { name: string; slug: string; description: string; image_url?: string }
 
@@ -44,10 +45,6 @@ export default function CategoryCreateEditDialog({ mode = "create", category = n
     setFieldErrors((p) => { const n = { ...p }; delete n[k]; return n })
   }
 
-  function slugify(v: string) {
-    return v.toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-")
-  }
-
   async function submit(payload: any) {
     const url = mode === "create" ? "/api/admin/categories" : `/api/admin/categories/${category.id}`
     const method = mode === "create" ? "POST" : "PATCH"
@@ -70,7 +67,7 @@ export default function CategoryCreateEditDialog({ mode = "create", category = n
         setPreviewUrl(finalUrl)
       }
 
-      const payload = { name: form.name.trim(), slug: (form.slug || slugify(form.name)).trim(), description: form.description.trim() || undefined, image_url: finalUrl || undefined }
+      const payload = { name: form.name.trim(), slug: slugify(form.name).trim(), description: form.description.trim() || undefined, image_url: finalUrl || undefined }
 
       const { res, json } = await submit(payload)
 
@@ -117,21 +114,15 @@ export default function CategoryCreateEditDialog({ mode = "create", category = n
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid grid-cols-1 gap-4">
             <div>
-              <Label>Name</Label>
+              <Label className="pb-2">Name</Label>
               <Input value={form.name} onChange={(e) => updateField("name", e.target.value)} />
               <FieldError errors={(fieldErrors.name || []).map((m) => ({ message: m }))} />
-            </div>
-
-            <div>
-              <Label>Slug</Label>
-              <Input value={form.slug} onChange={(e) => updateField("slug", e.target.value)} />
-              <FieldError errors={(fieldErrors.slug || []).map((m) => ({ message: m }))} />
             </div>
 
             <ImageUploader value={previewUrl} onChange={(file, preview) => { setImageFile(file); setPreviewUrl(preview); setFieldErrors((p) => { const n = { ...p }; delete n.image; return n }) }} error={fieldErrors.image_url} />
 
             <div>
-              <Label>Description</Label>
+              <Label className="pb-2">Description</Label>
               <Textarea value={form.description} onChange={(e) => updateField("description", e.target.value)} />
             </div>
           </div>

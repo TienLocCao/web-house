@@ -9,7 +9,7 @@ export const ProjectCreateSchema = z.object({
   client_name: z.string().optional().nullable(),
   location: z.string().optional().nullable(),
   image_url: z.string().min(1),
-  gallery: z.array(z.string().url()).optional().default([]),
+  gallery: z.array(z.string()).optional().default([]),
   room_type: z.string().optional().nullable(),
   status: ProjectStatusEnum.optional().default("completed"),
   completion_date: z.string().optional().nullable(),

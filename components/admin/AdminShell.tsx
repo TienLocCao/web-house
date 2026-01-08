@@ -12,7 +12,6 @@ export default function AdminShell({
   admin: any
   children: React.ReactNode
 }) {
-  const [activePage, setActivePage] = useState("dashboard")
   const [isCollapsed, setIsCollapsed] = useState(false)
 
   return (
@@ -20,8 +19,6 @@ export default function AdminShell({
       {/* Sidebar */}
       <AdminSidebar
         admin={admin}
-        activePage={activePage}
-        setActivePage={setActivePage}
         isCollapsed={isCollapsed}
         setIsCollapsed={setIsCollapsed}
       />

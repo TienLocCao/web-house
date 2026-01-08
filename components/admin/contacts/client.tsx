@@ -44,7 +44,7 @@ export default function ContactsClient({ initialData, initialTotal }: any) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 flex flex-col min-h-0">
       <div>
         <h1 className="text-3xl font-bold text-neutral-900">Contact Inquiries</h1>
         <p className="text-neutral-600 mt-1">Manage customer inquiries and messages</p>
