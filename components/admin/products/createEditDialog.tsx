@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useToast } from "@/hooks/useToast"
 import { useRoomTypes } from "@/hooks/useRoomTypes"
+import { slugify } from '@/lib/utils/slugify'
 import {
   Dialog,
   DialogTrigger,
@@ -121,15 +122,6 @@ export default function ProductCreateEditDialog({
     }
     setFieldErrors({})
   }, [product, open])
-
-  // ===== helpers =====
-  function slugify(v: string) {
-    return v
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, "")
-      .trim()
-      .replace(/\s+/g, "-")
-  }
 
   function updateField<K extends keyof ProductFormState>(
     key: K,
