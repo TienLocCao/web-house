@@ -9,7 +9,7 @@ export async function getProjects({ page = 1, limit = 5, sort = [], filter = {} 
   const { offset } = query.buildPagination(page, limit)
 
   const items = (await sql`
-    SELECT id, title, slug, client_name, location, image_url, gallery, room_type, status, completion_date, budget, featured, created_at, updated_at
+    SELECT id, title, slug, client_name, location, image_url, gallery, room_type, status, description, completion_date, budget, featured, created_at, updated_at
     FROM projects
     ${where}
     ${sql.unsafe(orderBy)}
