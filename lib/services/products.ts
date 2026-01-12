@@ -29,6 +29,7 @@ export async function getProducts({
       p.is_available,
       p.image_url,
       p.room_type,
+      p.category_id AS category_id,
       c.name AS category_name
     FROM products p
     LEFT JOIN categories c ON p.category_id = c.id

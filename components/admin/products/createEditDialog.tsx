@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useToast } from "@/hooks/useToast"
 import { useRoomTypes } from "@/hooks/useRoomTypes"
+import { useCategogies } from "@/hooks/useCategogies"
 import { slugify } from '@/lib/utils/slugify'
 import {
   Dialog,
@@ -32,7 +33,7 @@ import { uploadImage, deleteImage } from "@/lib/services/imageUpload"
 type ProductFormState = {
   name: string
   slug: string
-  category_name: string
+  category_id: string
   room_type: string
   price: string
   stock: string
@@ -45,7 +46,7 @@ type ProductFormState = {
 type ProductPayload = {
   name: string
   slug: string
-  category_name: string
+  category_id: number
   room_type?: string
   price: number
   stock: number
@@ -58,7 +59,7 @@ type ProductPayload = {
 const EMPTY_FORM: ProductFormState = {
   name: "",
   slug: "",
-  category_name: "",
+  category_id: "",
   room_type: "",
   price: "0",
   stock: "0",
@@ -83,6 +84,7 @@ export default function ProductCreateEditDialog({
 }) {
   const { toast } = useToast()
   const { values: roomTypes, isLoading: roomTypesLoading } = useRoomTypes()
+  const { values: categogies, isLoading: categogiesLoading } = useCategogies()
 
   // ===== form =====
   const [form, setForm] = useState<ProductFormState>(EMPTY_FORM)
@@ -103,7 +105,7 @@ export default function ProductCreateEditDialog({
       setForm({
         name: product.name ?? "",
         slug: product.slug ?? "",
-        category_name: product.category_name ?? "",
+        category_id: product.category_id?.toString() ?? "",
         room_type: product.room_type ?? "",
         price: product.price?.toString() ?? "0",
         stock: product.stock?.toString() ?? "0",
@@ -149,7 +151,7 @@ export default function ProductCreateEditDialog({
     return {
       name: form.name.trim(),
       slug: (form.slug || slugify(form.name)).trim(),
-      category_name: form.category_name.trim(),
+      category_id: Number(form.category_id),
       room_type: form.room_type || undefined,
       price: Number(form.price) || 0,
       stock: Number(form.stock) || 0,
@@ -257,11 +259,32 @@ export default function ProductCreateEditDialog({
 
             <div>
               <Label className="pb-2">Category</Label>
-              <Input
-                value={form.category_name}
-                onChange={(e) => updateField("category_name", e.target.value)}
-              />
-              <FieldError errors={(fieldErrors.category_name || []).map((m) => ({ message: m }))} />
+              <Select
+                value={form.category_id}
+                onValueChange={(v) => {updateField("category_id", v)}}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select room" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categogiesLoading && (
+                    <SelectItem value="" disabled>
+                      Loading...
+                    </SelectItem>
+                  )}
+                  {!categogiesLoading && categogies.length === 0 && (
+                    <SelectItem value="" disabled>
+                      No room types
+                    </SelectItem>
+                  )}
+                  {categogies.map((v: {id: number, name: string}) => (
+                    <SelectItem key={v.id} value={String(v.id)}>
+                      {v.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FieldError errors={(fieldErrors.category_id || []).map((m) => ({ message: m }))} />
             </div>
 
             <div>

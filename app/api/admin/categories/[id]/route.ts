@@ -64,6 +64,19 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     const [category] = await sql`SELECT image_url FROM categories WHERE id = ${categoryId}`
     if (!category) return NextResponse.json({ message: "Category not found" }, { status: 404 })
 
+    const products =
+      await sql`SELECT image_url FROM products WHERE category_id = ${categoryId}`
+
+    for (const p of products) {
+      if (p.image_url) {
+        try {
+          await deleteImageByUrl(p.image_url)
+        } catch (err) {
+          console.warn("Cannot delete product image:", p.image_url, err)
+        }
+      }
+    }
+
     if (category.image_url) {
       try {
         await deleteImageByUrl(category.image_url)
@@ -71,8 +84,9 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
         console.warn("Cannot delete image file:", err)
       }
     }
-
+    await sql`DELETE FROM products WHERE category_id = ${categoryId}`
     await sql`DELETE FROM categories WHERE id = ${categoryId}`
+    
 
     return NextResponse.json({ message: "Category deleted" })
   })
