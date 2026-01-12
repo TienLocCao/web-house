@@ -261,7 +261,7 @@ export default function ProductCreateEditDialog({
               <Label className="pb-2">Category</Label>
               <Select
                 value={form.category_id}
-                onValueChange={(v) => {console.log("xxxx", v);updateField("category_id", v)}}
+                onValueChange={(v) => {updateField("category_id", v)}}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select room" />
