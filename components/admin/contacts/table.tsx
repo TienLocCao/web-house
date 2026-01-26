@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Mail, Phone, Trash2 } from "lucide-react"
-import { useToast } from "@/hooks/useToast"
 import type { Contact } from "@/lib/types/contact"
+import { useContactActions } from "@/hooks/admin"
+import { useContactsData } from "@/hooks/admin/useContactsData"
 import {
   Select,
   SelectTrigger,
@@ -28,144 +29,57 @@ const statusColors: Record<string, string> = {
 }
 
 export function ContactsTable({ initialData, initialTotal, search, status }: ContactsTableProps) {
-  const { toast } = useToast()
-  const [data, setData] = useState<Contact[]>(initialData)
-  const [total, setTotal] = useState(initialTotal)
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
-  const [loading, setLoading] = useState(false)
   const [updating, setUpdating] = useState<number | null>(null)
 
-  useEffect(() => {
-    let ignore = false
-    async function fetchData() {
-      setLoading(true)
-      try {
-        const params = new URLSearchParams()
-        params.set("page", String(page))
-        params.set("limit", String(limit))
-        if (search) params.set("search", search)
-        if (status) params.set("status", status)
+  const { data, total, isLoading: dataLoading } = useContactsData({
+    page,
+    limit,
+    search,
+    status,
+  })
+  const { handleDelete: hookDelete, handleStatusChange: hookStatusChange, isLoading: actionLoading } = useContactActions()
 
-        const res = await fetch(`/api/admin/contacts?${params.toString()}`)
-        if (!res.ok) throw new Error("Failed to fetch contacts")
-
-        const json: { items: Contact[]; total: number } = await res.json()
-
-        if (!ignore) {
-          if (json.items.length === 0 && page > 1) {
-            setPage((p) => Math.max(1, p - 1))
-            return
-          }
-          setData(json.items)
-          setTotal(json.total)
-        }
-      } catch (err) {
-        console.error(err)
-      } finally {
-        if (!ignore) setLoading(false)
-      }
-    }
-
-    fetchData()
-    return () => {
-      ignore = true
-    }
-  }, [page, search, status, limit])
-
-  // when filters change, reset to first page
-  useEffect(() => {
-    setPage(1)
-  }, [search, status])
+  // Use API data if available, otherwise use initial data
+  const displayData = data.length > 0 ? data : initialData
+  const displayTotal = data.length > 0 ? total : initialTotal
 
   const handleStatusChange = async (contactId: number, newStatus: string) => {
     setUpdating(contactId)
 
-    setData(prev =>
-      prev.map(c =>
-        c.id === contactId ? { ...c, status: newStatus } : c
-      )
-    )
-
     try {
-      const response = await fetch(`/api/admin/contacts/${contactId}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to update status")
-      }
-
-      toast({ title: "Status updated", type: "success" })
-    } catch (error) {
-      toast({ title: "Failed to update status", type: "error" })
-      setData((prev: any) =>
-        prev.map((c: any) =>
-          c.id === contactId ? { ...c, status } : c
-        )
-      )
+      await hookStatusChange(contactId, newStatus)
     } finally {
       setUpdating(null)
     }
   }
-
 
   const handleDelete = async (contactId: number) => {
-    if (!confirm("Are you sure you want to delete this inquiry?")) return
-
     setUpdating(contactId)
-
     try {
-      const response = await fetch(`/api/admin/contacts/${contactId}`, { method: "DELETE" })
-
-      if (response.ok) {
-        toast({ title: "Inquiry deleted", type: "success" })
-        // Refetch data
-        const params = new URLSearchParams()
-        params.set("page", String(page))
-        params.set("limit", String(limit))
-        if (search) params.set("search", search)
-        if (status) params.set("status", status)
-
-        const res = await fetch(`/api/admin/contacts?${params.toString()}`)
-        if (res.ok) {
-          const json: { items: Contact[]; total: number } = await res.json()
-          setData(json.items)
-          setTotal(json.total)
-          if (json.items.length === 0 && page > 1) {
-            setPage((p) => Math.max(1, p - 1))
-          }
-        }
-      } else {
-        const json = await response.json().catch(() => null)
-        toast({ title: json?.error || "Failed to delete inquiry", type: "error" })
-      }
-    } catch (error) {
-      console.error("Delete error:", error)
-      toast({ title: "An error occurred", type: "error" })
+      await hookDelete(contactId)
     } finally {
       setUpdating(null)
     }
   }
 
-  const totalPages = Math.ceil(total / limit)
+  const totalPages = Math.ceil(displayTotal / limit)
 
   return (
     <div className="space-y-4">
       <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
         <div className="divide-y divide-neutral-200">
-          {loading ? (
+          {dataLoading ? (
             <div className="text-center py-12">
               <p className="text-neutral-500">Loading...</p>
             </div>
-          ) : data.length === 0 ? (
+          ) : displayData.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-neutral-500">No contact inquiries found</p>
             </div>
           ) : (
-            data.map((contact) => (
+            displayData.map((contact) => (
               <div key={contact.id} className="p-6 hover:bg-neutral-50">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -215,7 +129,7 @@ export function ContactsTable({ initialData, initialTotal, search, status }: Con
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDelete(contact.id)}
-                    disabled={updating === contact.id}
+                    disabled={updating === contact.id || actionLoading}
                     className="text-red-600 hover:text-red-700 hover:bg-red-50"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -230,14 +144,14 @@ export function ContactsTable({ initialData, initialTotal, search, status }: Con
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-neutral-600">
-            Showing {((page - 1) * limit) + 1} to {Math.min(page * limit, total)} of {total} results
+            Showing {((page - 1) * limit) + 1} to {Math.min(page * limit, displayTotal)} of {displayTotal} results
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1 || loading}
+              disabled={page === 1 || dataLoading}
             >
               Previous
             </Button>
@@ -248,7 +162,7 @@ export function ContactsTable({ initialData, initialTotal, search, status }: Con
               variant="outline"
               size="sm"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages || loading}
+              disabled={page === totalPages || dataLoading}
             >
               Next
             </Button>

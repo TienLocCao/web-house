@@ -4,6 +4,9 @@ export { cn } from "./cn"
 // API client
 export { apiClient } from "./api-client"
 
+// Secure fetch utilities
+export { secureFetch, secureFetchJSON } from "./secure-fetch"
+
 // Logger
 export { logger } from "./logger"
 

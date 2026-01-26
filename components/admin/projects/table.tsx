@@ -1,9 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import type { Project } from "@/lib/types/project"
 import { CoreTable } from "@/components/core/CoreTable"
 import type { Column, SortItem } from "@/lib/types/table"
+import { useProjectActions } from "@/hooks/admin"
+import { useProjectsData } from "@/hooks/admin/useProjectsData"
 
 interface ProjectsTableProps {
   initialData: Project[]
@@ -16,12 +18,23 @@ interface ProjectsTableProps {
 }
 
 export function ProjectsTable({ initialData, initialTotal, onEdit, onDelete, refreshKey, search, status }: ProjectsTableProps) {
-  const [data, setData] = useState<Project[]>(initialData)
-  const [total, setTotal] = useState(initialTotal)
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
   const [sort, setSort] = useState<SortItem[]>([])
-  const [loading, setLoading] = useState(false)
+
+  const { data, total, isLoading: dataLoading } = useProjectsData({
+    page,
+    limit,
+    sort,
+    search,
+    status,
+    refreshKey,
+  })
+  const { handleBulkDelete, isLoading: actionLoading } = useProjectActions()
+
+  // Use API data if available, otherwise use initial data
+  const displayData = data.length > 0 ? data : initialData
+  const displayTotal = data.length > 0 ? total : initialTotal
 
   const columns: Column<Project>[] = [
     { key: "title", header: "Title", sortable: true },
@@ -38,50 +51,15 @@ export function ProjectsTable({ initialData, initialTotal, onEdit, onDelete, ref
     },
   ]
 
-  useEffect(() => {
-    let ignore = false
-    async function fetchData() {
-      setLoading(true)
-      try {
-        const params = new URLSearchParams()
-        params.set("page", String(page))
-        params.set("limit", String(limit))
-        params.set("sort", JSON.stringify(sort))
-        if (search) params.set("search", search)
-        if (status) params.set("status", status)
-
-        const res = await fetch(`/api/admin/projects?${params.toString()}`)
-        if (!res.ok) throw new Error("Failed to fetch projects")
-        const json: { items: Project[]; total: number } = await res.json()
-        if (!ignore) {
-          if (json.items.length === 0 && page > 1) { setPage((p) => Math.max(1, p - 1)); return }
-          setData(json.items)
-          setTotal(json.total)
-        }
-      } catch (err) {
-        console.error(err)
-      } finally {
-        if (!ignore) setLoading(false)
-      }
-    }
-    fetchData()
-    return () => { ignore = true }
-  }, [page, sort, refreshKey, search, status])
-
-  // when filters change, reset to first page
-  useEffect(() => {
-    setPage(1)
-  }, [search, status])
-
   const deleteMany = async (ids: number[], mode: string) => {
     if (ids.length === 0 && mode !== "all") return
-    const LEN = mode === "all" ? total : ids.length
+    const LEN = mode === "all" ? displayTotal : ids.length
     if (!confirm(`Delete ${LEN} projects?`)) return
-    await fetch("/api/admin/projects/bulk-delete", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids, mode }) })
+    await handleBulkDelete(ids)
     setPage(1)
   }
   return (
-    <CoreTable columns={columns} data={data} total={total} page={page} limit={limit} sort={sort} isLoading={loading} onPageChange={setPage} onSortChange={setSort} onEdit={onEdit} onDelete={onDelete} renderBulkActionBar={(s) => s.mode !== "none" ? (
+    <CoreTable columns={columns} data={displayData} total={displayTotal} page={page} limit={limit} sort={sort} isLoading={dataLoading || actionLoading} onPageChange={setPage} onSortChange={setSort} onEdit={onEdit} onDelete={onDelete} renderBulkActionBar={(s) => s.mode !== "none" ? (
       <div className="flex items-center gap-3">
         <div>{s.selectedCount} selected</div>
         <button className="btn" onClick={() => deleteMany(s.selectedIds, s.mode)}>Delete</button>

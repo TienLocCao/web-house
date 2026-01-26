@@ -142,7 +142,7 @@ export default function ProjectCreateEditDialog({
       let cover = form.image_url
 
       if (imageFileRef.current) {
-        cover = await uploadImage(imageFileRef.current, form.image_url)
+        cover = await uploadImage(imageFileRef.current, form.image_url, "projects")
         newlyUploadedRef.current.push(cover)
       }
 
@@ -173,6 +173,11 @@ export default function ProjectCreateEditDialog({
       )
 
       if (!res.ok) throw new Error("Save failed")
+
+      // Delete old cover image when successfully replaced with new one
+      if (imageFileRef.current && initialImagesRef.current[0] && initialImagesRef.current[0] !== cover) {
+        await deleteImage(initialImagesRef.current[0])
+      }
 
       toast({ title: "Saved successfully", type: "success" })
       onOpenChange(false)

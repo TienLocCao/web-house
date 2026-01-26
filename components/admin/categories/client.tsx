@@ -11,6 +11,7 @@ import { CategoryDeleteDialog } from "@/components/admin/categories/deleteDialog
 import { Input } from "@/components/ui/input"
 import { useDebounce } from "@/hooks/useDebounce"
 import { X } from "lucide-react"
+import { secureFetchJSON } from "@/lib/utils"
 
 export default function CategoriesClient({ initialData, initialTotal }: any) {
   const router = useRouter()
@@ -50,12 +51,7 @@ export default function CategoriesClient({ initialData, initialTotal }: any) {
 
   async function handleDeleteConfirm(id: string) {
     try {
-      const res = await fetch(`/api/admin/categories/${id}`, { method: "DELETE", credentials: "include" })
-      const json = await res.json().catch(() => null)
-      if (!res.ok) {
-        toast({ title: json?.message || "Failed to delete category", type: "error" })
-        return
-      }
+      const json = await secureFetchJSON(`/api/admin/categories/${id}`, { method: "DELETE", credentials: "include" })
       toast({ title: "Category deleted", type: "success" })
       setDeleteOpen(false)
       setRefreshKey((s) => s + 1)

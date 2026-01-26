@@ -3,60 +3,27 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Check, Trash2, Star } from "lucide-react"
-import { useRouter } from "next/navigation"
 import type { Review } from "@/lib/types/review"
-import { useToast } from "@/hooks/useToast"
+import { useReviewActions } from "@/hooks/admin/useReviewActions"
 
 interface ReviewsTableProps {
   reviews: Review[]
 }
 
 export function ReviewsTable({ reviews }: ReviewsTableProps) {
-  const router = useRouter()
   const [updating, setUpdating] = useState<number | null>(null)
+  const { handleApprove, handleDelete, isLoading } = useReviewActions()
 
-  const { toast } = useToast()
-
-  const handleApprove = async (reviewId: number) => {
+  const onApprove = async (reviewId: number) => {
     setUpdating(reviewId)
-
-    try {
-      const response = await fetch(`/api/admin/reviews/${reviewId}/approve`, { method: "PATCH" })
-      if (response.ok) {
-        toast({ title: "Review approved", type: "success" })
-        router.refresh()
-      } else {
-        const json = await response.json().catch(() => null)
-        toast({ title: json?.error || "Failed to approve review", type: "error" })
-      }
-    } catch (error) {
-      console.error(error)
-      toast({ title: "An error occurred", type: "error" })
-    } finally {
-      setUpdating(null)
-    }
+    await handleApprove(reviewId)
+    setUpdating(null)
   }
 
-  const handleReject = async (reviewId: number) => {
-    if (!confirm("Are you sure you want to reject this review?")) return
-
+  const onDelete = async (reviewId: number) => {
     setUpdating(reviewId)
-
-    try {
-      const response = await fetch(`/api/admin/reviews/${reviewId}`, { method: "DELETE" })
-      if (response.ok) {
-        toast({ title: "Review deleted", type: "success" })
-        router.refresh()
-      } else {
-        const json = await response.json().catch(() => null)
-        toast({ title: json?.error || "Failed to delete review", type: "error" })
-      }
-    } catch (error) {
-      console.error(error)
-      toast({ title: "An error occurred", type: "error" })
-    } finally {
-      setUpdating(null)
-    }
+    await handleDelete(reviewId)
+    setUpdating(null)
   }
 
   return (
@@ -108,8 +75,8 @@ export function ReviewsTable({ reviews }: ReviewsTableProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleApprove(review.id)}
-                    disabled={updating === review.id}
+                    onClick={() => onApprove(review.id)}
+                    disabled={updating === review.id || isLoading}
                     className="gap-2 text-green-600 border-green-600 hover:bg-green-50"
                   >
                     <Check className="w-4 h-4" />
@@ -119,8 +86,8 @@ export function ReviewsTable({ reviews }: ReviewsTableProps) {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleReject(review.id)}
-                  disabled={updating === review.id}
+                  onClick={() => onDelete(review.id)}
+                  disabled={updating === review.id || isLoading}
                   className="gap-2 text-red-600 border-red-600 hover:bg-red-50"
                 >
                   <Trash2 className="w-4 h-4" />
