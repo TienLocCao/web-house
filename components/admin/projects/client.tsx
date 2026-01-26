@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useDebounce } from "@/hooks/useDebounce"
 import { X } from "lucide-react"
+import { secureFetchJSON } from "@/lib/utils"
 
 export default function ProjectsClient({ initialData, initialTotal }: any) {
   const router = useRouter()
@@ -62,12 +63,7 @@ export default function ProjectsClient({ initialData, initialTotal }: any) {
 
   async function handleDeleteConfirm(id: string) {
     try {
-      const res = await fetch(`/api/admin/projects/${id}`, { method: "DELETE", credentials: "include" })
-      const json = await res.json().catch(() => null)
-      if (!res.ok) {
-        toast({ title: json?.message || "Failed to delete project", type: "error" })
-        return
-      }
+      const json = await secureFetchJSON(`/api/admin/projects/${id}`, { method: "DELETE", credentials: "include" })
       toast({ title: "Project deleted", type: "success" })
       setDeleteOpen(false)
       setRefreshKey((s) => s + 1)

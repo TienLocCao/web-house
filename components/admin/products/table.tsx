@@ -1,10 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import type { Product } from "@/lib/types/product"
 import { CoreTable } from "@/components/core/CoreTable"
 import type { Column, SortItem } from "@/lib/types/table"
 import { BulkDeleteBar } from "@/components/admin/products/BulkDeleteBar"
+import { useProductActions } from "@/hooks/admin"
+import { useProductsData } from "@/hooks/admin/useProductsData"
 
 interface ProductsTableProps {
   initialData: Product[]
@@ -25,12 +27,23 @@ export function ProductsTable({
   search,
   roomType,
 }: ProductsTableProps) {
-  const [data, setData] = useState<Product[]>(initialData)
-  const [total, setTotal] = useState(initialTotal)
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
   const [sort, setSort] = useState<SortItem[]>([])
-  const [loading, setLoading] = useState(false)
+
+  const { data, total, isLoading: dataLoading } = useProductsData({
+    page,
+    limit,
+    sort,
+    search,
+    roomType,
+    refreshKey,
+  })
+  const { handleBulkDelete, isLoading: actionLoading } = useProductActions()
+
+  // Use API data if available, otherwise use initial data
+  const displayData = data.length > 0 ? data : initialData
+  const displayTotal = data.length > 0 ? total : initialTotal
 
   /* ---------------- columns ---------------- */
   const columns: Column<Product>[] = [
@@ -57,73 +70,15 @@ export function ProductsTable({
     },
   ]
 
-  /* ---------------- fetch data ---------------- */
-  useEffect(() => {
-    let ignore = false
-    function buildSortParam(sort: any[]) {
-      if (!sort || sort.length === 0) return "newest"
-
-      const s = sort[0]
-
-      return s.desc ? `${s.id}_desc` : `${s.id}_asc`
-    }
-    async function fetchData() {
-      setLoading(true)
-      try {
-        const params = new URLSearchParams()
-        params.set("page", String(page))
-        params.set("limit", String(limit))
-        params.set("sort", buildSortParam(sort))
-        if (search) params.set("search", search)
-        if (roomType) params.set("room_type", roomType)
-
-        const res = await fetch(`/api/admin/products?${params.toString()}`)
-
-        if (!res.ok) throw new Error("Failed to fetch products")
-
-        const json: { items: Product[]; total: number } = await res.json()
-
-        if (!ignore) {
-          if (json.items.length === 0 && page > 1) {
-            setPage((p) => Math.max(1, p - 1))
-            return
-          }
-          setData(json.items)
-          setTotal(json.total)
-        }
-      } catch (err) {
-        console.error(err)
-      } finally {
-        if (!ignore) setLoading(false)
-      }
-    }
-
-    fetchData()
-    return () => {
-      ignore = true
-    }
-  }, [page, sort, refreshKey, search, roomType])
-
-  // when filters change, reset to first page
-  useEffect(() => {
-    setPage(1)
-  }, [search, roomType])
-
   /* ---------------- bulk delete ---------------- */
   const deleteMany = async (ids: number[], mode: string) => {
     if (ids.length === 0 && mode !== "all") return
-    const LEN = mode === "all" ? total : ids.length
+    const LEN = mode === "all" ? displayTotal : ids.length
     
 
     if (!confirm(`Delete ${LEN} products?`)) return
 
-    await fetch("/api/admin/products/bulk-delete", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids, mode }),
-    })
-
-    // reload current page
+    await handleBulkDelete(ids)
     setPage(1)
   }
 
@@ -136,7 +91,7 @@ export function ProductsTable({
       page={page}
       limit={limit}
       sort={sort}
-      isLoading={loading}
+      isLoading={dataLoading}
       onPageChange={setPage}
       onSortChange={setSort}
       onEdit={onEdit}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import type { Category } from "@/lib/types/category"
 import { CoreTable } from "@/components/core/CoreTable"
 import type { Column, SortItem } from "@/lib/types/table"
+import { secureFetchJSON } from "@/lib/utils"
 
 interface CategoriesTableProps {
   initialData: Category[]
@@ -46,9 +47,7 @@ export function CategoriesTable({ initialData, initialTotal, onEdit, onDelete, r
         params.set("sort", JSON.stringify(sort))
         if (search) params.set("search", search)
 
-        const res = await fetch(`/api/admin/categories?${params.toString()}`)
-        if (!res.ok) throw new Error("Failed to fetch categories")
-        const json: { items: Category[]; total: number } = await res.json()
+        const json: { items: Category[]; total: number } = await secureFetchJSON(`/api/admin/categories?${params.toString()}`)
         if (!ignore) {
           if (json.items.length === 0 && page > 1) {
             setPage((p) => Math.max(1, p - 1))
@@ -77,7 +76,7 @@ export function CategoriesTable({ initialData, initialTotal, onEdit, onDelete, r
     if (ids.length === 0 && mode !== "all") return
     const LEN = mode === "all" ? total : ids.length
     if (!confirm(`Delete ${LEN} categories?`)) return
-    await fetch("/api/admin/categories/bulk-delete", {
+    await secureFetchJSON("/api/admin/categories/bulk-delete", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids, mode }),

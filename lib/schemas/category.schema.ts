@@ -4,7 +4,7 @@ export const CategoryCreateSchema = z.object({
   name: z.string().min(1),
   slug: z.string().min(1),
   description: z.string().optional().nullable(),
-  image_url: z.string().optional().nullable(),
+  image_url: z.string().min(1),
 })
 
 export const CategoryUpdateSchema = CategoryCreateSchema.partial()

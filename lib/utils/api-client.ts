@@ -10,7 +10,32 @@ class APIClient {
     this.baseURL = process.env.NEXT_PUBLIC_API_URL || ""
   }
 
+  private async handleUnauthorized(): Promise<void> {
+    try {
+      // Call logout endpoint to clear server-side session
+      await fetch("/api/admin/auth/logout", { method: "POST", credentials: "include" })
+    } catch (e) {
+      // Ignore network errors
+    }
+
+    try {
+      // Clear client-side storage
+      localStorage.removeItem("admin-last-active")
+    } catch {}
+
+    // Trigger logout redirect
+    if (typeof window !== "undefined") {
+      window.location.href = "/admin/login"
+    }
+  }
+
   private async handleResponse<T>(response: Response): Promise<T> {
+    // Handle 401 Unauthorized - trigger automatic logout
+    if (response.status === 401) {
+      await this.handleUnauthorized()
+      throw new Error("Session expired. Redirecting to login...")
+    }
+
     if (!response.ok) {
       const error: APIError = await response.json().catch(() => ({
         error: "An unexpected error occurred",

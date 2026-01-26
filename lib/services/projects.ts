@@ -2,6 +2,7 @@ import { sql } from "@/lib/db"
 import query from "@/lib/db/query"
 import type { Project } from "@/lib/types/project"
 import type { PaginatedResult } from "@/lib/types/pagination"
+import { secureFetchJSON } from "@/lib/utils"
 
 export async function getProjects({ page = 1, limit = 5, sort = [], filter = {} }: { page?: number; limit?: number; sort?: any[]; filter?: any }): Promise<PaginatedResult<Project>> {
   const where = query.buildWhere(filter)
@@ -50,19 +51,13 @@ function normalizeProjectPayload(project: Project) {
 export async function createProject(project: Project) {
   const payload = normalizeProjectPayload(project)
 
-  const res = await fetch("/api/admin/projects", {
+  return secureFetchJSON("/api/admin/projects", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
   })
-
-  if (!res.ok) {
-    throw new Error("Create project failed")
-  }
-
-  return res.json()
 }
 
 /**
@@ -71,17 +66,11 @@ export async function createProject(project: Project) {
 export async function updateProject(id: string, project: Project) {
   const payload = normalizeProjectPayload(project)
 
-  const res = await fetch(`/api/admin/projects/${id}`, {
+  return secureFetchJSON(`/api/admin/projects/${id}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
   })
-
-  if (!res.ok) {
-    throw new Error("Update project failed")
-  }
-
-  return res.json()
 }

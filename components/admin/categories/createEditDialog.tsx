@@ -24,6 +24,7 @@ export default function CategoryCreateEditDialog({ mode = "create", category = n
   const [previewUrl, setPreviewUrl] = useState("")
   const [saving, setSaving] = useState(false)
   const newlyUploadedRef = useRef<string[]>([])
+  /** ảnh đã tồn tại ban đầu */
   const initialImageRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -61,7 +62,7 @@ export default function CategoryCreateEditDialog({ mode = "create", category = n
     try {
       let finalUrl = form.image_url
       if (imageFile) {
-        finalUrl = await uploadImage(imageFile, form.image_url)
+        finalUrl = await uploadImage(imageFile, form.image_url, "categories")
         newlyUploadedRef.current.push(finalUrl)
         setForm((p) => ({ ...p, image_url: finalUrl }))
         setPreviewUrl(finalUrl)
@@ -84,6 +85,11 @@ export default function CategoryCreateEditDialog({ mode = "create", category = n
           toast({ title: json?.message || "Save failed", type: "error" })
         }
         return
+      }
+
+      // Delete old image when successfully replaced with new one
+      if (imageFile && initialImageRef.current && initialImageRef.current !== finalUrl) {
+        await deleteImage(initialImageRef.current)
       }
 
       toast({ title: mode === "create" ? "Category created" : "Category updated", type: "success" })

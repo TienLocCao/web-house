@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/useToast"
 import { Button } from "@/components/ui/button"
 import NewsletterCreateEditDialog from "@/components/admin/newsletter/createEditDialog"
 import { NewsletterTable } from "@/components/admin/newsletter/table"
+import { secureFetchJSON } from "@/lib/utils"
 
 export default function NewsletterClient({ initialData, initialTotal }: any) {
   const { toast } = useToast()
@@ -14,9 +15,7 @@ export default function NewsletterClient({ initialData, initialTotal }: any) {
 
   async function handleDeleteConfirm(id: string) {
     try {
-      const res = await fetch(`/api/admin/newsletter/${id}`, { method: "DELETE", credentials: "include" })
-      const json = await res.json().catch(() => null)
-      if (!res.ok) { toast({ title: json?.message || "Failed to delete", type: "error" }); return }
+      const json = await secureFetchJSON(`/api/admin/newsletter/${id}`, { method: "DELETE", credentials: "include" })
       toast({ title: "Subscriber deleted", type: "success" })
       setRefreshKey((s) => s + 1)
     } catch (err: any) {
@@ -26,9 +25,7 @@ export default function NewsletterClient({ initialData, initialTotal }: any) {
 
   async function handleToggleActive(s: any) {
     try {
-      const res = await fetch(`/api/admin/newsletter/${s.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ is_active: !s.is_active }) })
-      const json = await res.json().catch(() => null)
-      if (!res.ok) { toast({ title: json?.message || "Failed to update", type: "error" }); return }
+      const json = await secureFetchJSON(`/api/admin/newsletter/${s.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ is_active: !s.is_active }) })
       toast({ title: "Subscriber updated", type: "success" })
       setRefreshKey((r) => r + 1)
     } catch (err: any) {

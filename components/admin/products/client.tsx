@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useRoomTypes } from "@/hooks/useRoomTypes"
 import { useDebounce } from "@/hooks/useDebounce"
 import { X } from "lucide-react"
+import { secureFetchJSON } from "@/lib/utils"
 
 export default function ProductsClient({ initialData, initialTotal }: any) {
   const router = useRouter()
@@ -70,12 +71,7 @@ export default function ProductsClient({ initialData, initialTotal }: any) {
 
   async function handleDeleteConfirm(id: string) {
     try {
-      const res = await fetch(`/api/admin/products/${id}`, { method: "DELETE", credentials: "include" })
-      const json = await res.json().catch(() => null)
-      if (!res.ok) {
-        toast({ title: json?.message || "Failed to delete product", type: "error" })
-        return
-      }
+      const json = await secureFetchJSON(`/api/admin/products/${id}`, { method: "DELETE", credentials: "include" })
       toast({ title: "Product deleted", type: "success" })
       setDeleteOpen(false)
       // trigger table to refetch and handle empty page

@@ -30,7 +30,11 @@ export async function getProducts({
       p.image_url,
       p.room_type,
       p.category_id AS category_id,
-      c.name AS category_name
+      c.name AS category_name,
+      json_build_object(
+        'id', c.id,
+        'name', c.name
+      ) AS category
     FROM products p
     LEFT JOIN categories c ON p.category_id = c.id
     ${where}

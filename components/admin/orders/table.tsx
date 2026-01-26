@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/useToast"
 import { CoreTable } from "@/components/core/CoreTable"
 import type { Column, SortItem } from "@/lib/types/table"
 import type { Order } from "@/lib/types/order"
+import { secureFetchJSON } from "@/lib/utils"
 
 import {
   Select,
@@ -131,10 +132,7 @@ export function OrdersTable({ initialData, initialTotal, search, status }: Order
         if (search) params.set("search", search)
         if (status) params.set("status", status)
 
-        const res = await fetch(`/api/admin/orders?${params.toString()}`)
-        if (!res.ok) throw new Error("Failed to fetch orders")
-
-        const json: { items: Order[]; total: number } = await res.json()
+        const json: { items: Order[]; total: number } = await secureFetchJSON(`/api/admin/orders?${params.toString()}`)
 
         if (!ignore) {
           if (json.items.length === 0 && page > 1) {
@@ -166,7 +164,7 @@ export function OrdersTable({ initialData, initialTotal, search, status }: Order
     setUpdating(orderId)
 
     try {
-      const response = await fetch(`/api/admin/orders/${orderId}/status`, {
+      const response = await secureFetchJSON(`/api/admin/orders/${orderId}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -182,11 +180,8 @@ export function OrdersTable({ initialData, initialTotal, search, status }: Order
         if (search) params.set("search", search)
         if (status) params.set("status", status)
 
-        const res = await fetch(`/api/admin/orders?${params.toString()}`)
-        if (res.ok) {
-          const json: { items: Order[]; total: number } = await res.json()
-          setData(json.items)
-        }
+        const json: { items: Order[]; total: number } = await secureFetchJSON(`/api/admin/orders?${params.toString()}`)
+        setData(json.items)
       } else {
         const json = await response.json().catch(() => null)
         toast({ title: json?.error || "Failed to update order status", type: "error" })
