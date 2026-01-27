@@ -18,9 +18,9 @@ export function Header() {
   }, [])
 
   const navItems = [
-    { label: "Home", href: "#home" },
-    { label: "Categories", href: "#categories" },
-    { label: "Top Selling", href: "#top-selling" },
+    { label: "Home", href: "/" },
+    { label: "Products", href: "/products" },
+    { label: "About", href: "#about" },
     { label: "Contact", href: "#contact" },
   ]
 
@@ -54,7 +54,7 @@ export function Header() {
             <Button variant="ghost" size="icon">
               <ShoppingCart className="h-5 w-5" />
             </Button>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Get Started</Button>
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Shop Now</Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -82,7 +82,7 @@ export function Header() {
                   {item.label}
                 </Link>
               ))}
-              <Button className="w-full mt-4">Get Started</Button>
+              <Button className="w-full mt-4">Shop Now</Button>
             </div>
           </nav>
         )}

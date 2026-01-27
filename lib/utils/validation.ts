@@ -4,7 +4,7 @@ import { z } from "zod"
 export const ProductQuerySchema = z.object({
   query: z.string().optional(),
   category: z.string().optional(),
-  room_type: z.enum(["living_room", "dining_room", "bedroom", "kitchen", "bathroom", "office"]).optional(),
+  room_type: z.array(z.enum(["living_room", "dining_room", "bedroom", "kitchen", "bathroom", "office"])).optional(),
   min_price: z.number().min(0).optional(),
   max_price: z.number().min(0).optional(),
   is_featured: z.boolean().optional(),

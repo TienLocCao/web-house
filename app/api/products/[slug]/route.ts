@@ -8,6 +8,7 @@ export const dynamic = "force-dynamic"
 // GET /api/products/:slug - Get single product by slug
 export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
   try {
+    params = await params
     // Rate limiting
     const ip = getClientIP(request)
     const rateLimitResult = rateLimit(`product_${ip}`, {
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
       `
       SELECT * FROM products
       WHERE room_type = ${products[0].room_type} 
-        AND slug != $2 
+        AND slug != ${params.slug}
         AND is_available = true
       ORDER BY rating DESC
       LIMIT 4

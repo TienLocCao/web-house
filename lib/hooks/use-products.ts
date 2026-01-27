@@ -15,7 +15,7 @@ interface ProductsResponse {
 }
 
 interface UseProductsOptions {
-  room_type?: string
+  room_type?: string | string[]
   category?: string
   is_featured?: boolean
   limit?: number
@@ -42,7 +42,13 @@ export function useProducts(options: UseProductsOptions = {}) {
     params.set("limit", limit.toString())
     params.set("offset", (pageIndex * limit).toString())
 
-    if (options.room_type) params.set("room_type", options.room_type)
+    if (options.room_type) {
+      if (Array.isArray(options.room_type)) {
+        options.room_type.forEach(rt => params.append("room_type", rt))
+      } else {
+        params.set("room_type", options.room_type)
+      }
+    }
     if (options.category) params.set("category", options.category)
     if (options.is_featured) params.set("is_featured", "true")
     if (options.sort) params.set("sort", options.sort)

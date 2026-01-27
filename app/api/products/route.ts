@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     const q = ProductQuerySchema.parse({
       query: sp.get("query") || undefined,
       category: sp.get("category") || undefined,
-      room_type: sp.get("room_type") || undefined,
+      room_type: sp.getAll("room_type").length > 0 ? sp.getAll("room_type") : undefined,
       min_price: sp.get("min_price")
         ? Number(sp.get("min_price"))
         : undefined,
@@ -53,8 +53,8 @@ export async function GET(request: NextRequest) {
     if (q.query)
       where.push(sql`p.name ILIKE ${"%" + q.query + "%"}`)
 
-    if (q.room_type)
-      where.push(sql`p.room_type = ${q.room_type}`)
+    if (q.room_type && q.room_type.length > 0)
+      where.push(sql`p.room_type = ANY(${q.room_type})`)
 
     if (q.category)
       where.push(sql`c.slug = ${q.category}`)
