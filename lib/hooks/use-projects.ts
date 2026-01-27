@@ -33,3 +33,17 @@ export function useProjects(featured?: boolean, limit = 12) {
     isError: error,
   }
 }
+
+export function useProject(slug: string) {
+  const { data, error, isLoading } = useSWR<{
+    project: Project
+  }>(slug ? `/api/projects/${slug}` : null, fetcher, {
+    revalidateOnFocus: false,
+  })
+
+  return {
+    project: data?.project,
+    isLoading,
+    isError: error,
+  }
+}

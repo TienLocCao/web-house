@@ -116,7 +116,7 @@ export default function ProductsPage() {
                   { value: 'dining_room', label: 'Dining Room' },
                   { value: 'office', label: 'Office' },
                 ].map((room) => (
-                  <div key={room.value} className="flex items-center space-x-2">
+                  <div key={room.value} className="flex items-center space-x-2 mb-4">
                     <Checkbox
                       id={room.value}
                       checked={filterBy.includes(room.value)}
@@ -128,7 +128,7 @@ export default function ProductsPage() {
                         }
                       }}
                     />
-                    <label htmlFor={room.value} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    <label htmlFor={room.value} className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                       {room.label}
                     </label>
                   </div>
@@ -178,12 +178,13 @@ export default function ProductsPage() {
                   {hasMore && (
                     <div
                       ref={loadMoreRef}
-                      className="h-10 flex items-center justify-center"
                     >
                       {isValidating && (
-                        <span className="text-muted-foreground text-sm">
-                          Loading more products...
-                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                          {Array.from({ length: 3 }).map((_, i) => (
+                            <ProductCardSkeleton key={i} />
+                          ))}
+                        </div>
                       )}
                     </div>
                   )}
