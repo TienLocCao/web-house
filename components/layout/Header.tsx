@@ -4,10 +4,19 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Menu, X, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useCart } from "@/hooks/useCart"
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const { cart } = useCart()
+  
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -52,10 +61,19 @@ export function Header() {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
-            <Button variant="ghost" size="icon">
-              <ShoppingCart className="h-5 w-5" />
-            </Button>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Shop Now</Button>
+            <Link href="/cart">
+              <Button variant="ghost" size="icon" className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                {mounted && cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                    {cartCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
+            <Link href="/products">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Shop Now</Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -83,7 +101,20 @@ export function Header() {
                   {item.label}
                 </Link>
               ))}
-              <Button className="w-full mt-4">Shop Now</Button>
+              <Link href="/cart" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button variant="ghost" size="sm" className="w-full justify-start relative">
+                  <ShoppingCart className="h-5 w-5 mr-2" />
+                  Cart
+                  {mounted && cartCount > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold">
+                      {cartCount}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+              <Link href="/products" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button className="w-full mt-4">Shop Now</Button>
+              </Link>
             </div>
           </nav>
         )}
