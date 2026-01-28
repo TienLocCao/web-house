@@ -7,10 +7,10 @@ import { Header } from "@/components/layout/Header"
 import { Footer } from "@/components/layout/Footer"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
 import { useProjects } from "@/lib/hooks"
 import { Calendar, MapPin, User } from "lucide-react"
 import type { Project } from "@/lib/db"
+import { ProjectCardSkeleton } from "@/components/project/CardSkeleton"
 
 function ProjectCard({ project }: { project: Project }) {
   return (
@@ -68,20 +68,6 @@ function ProjectCard({ project }: { project: Project }) {
         )}
       </div>
     </Link>
-  )
-}
-
-function ProjectCardSkeleton() {
-  return (
-    <div className="space-y-4">
-      <Skeleton className="aspect-[4/3] rounded-lg" />
-      <div className="space-y-2">
-        <Skeleton className="h-6 w-3/4" />
-        <Skeleton className="h-4 w-1/2" />
-        <Skeleton className="h-4 w-1/3" />
-        <Skeleton className="h-4 w-full" />
-      </div>
-    </div>
   )
 }
 

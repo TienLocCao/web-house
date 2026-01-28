@@ -6,131 +6,17 @@ import Image from "next/image"
 import { Header } from "@/components/layout/Header"
 import { Footer } from "@/components/layout/Footer"
 import { ProductCard } from "@/components/shop/ProductCard"
+import { AddToCart } from "@/components/shop/AddToCart"
 import { useProduct } from "@/lib/hooks"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Heart, Share2, ShoppingCart, Minus, Plus } from "lucide-react"
-
-function ProductDetailSkeleton() {
-  return (
-    <section className="pt-32 pb-16">
-      <div className="container mx-auto px-4 lg:px-8">
-        {/* Product Detail */}
-        <div className="grid lg:grid-cols-2 gap-12 mb-24">
-          {/* Images */}
-          <div className="space-y-4">
-            <Skeleton className="aspect-square rounded-lg" />
-            <div className="grid grid-cols-4 gap-4">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="aspect-square rounded-lg" />
-              ))}
-            </div>
-          </div>
-
-          {/* Product Info */}
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <Skeleton className="h-6 w-20" />
-              <Skeleton className="h-10 w-3/4" />
-              <Skeleton className="h-5 w-1/2" />
-            </div>
-
-            <Skeleton className="h-24 w-full rounded-lg" />
-
-            <div className="space-y-4">
-              <Skeleton className="h-6 w-40" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-5/6" />
-                <Skeleton className="h-4 w-4/5" />
-              </div>
-            </div>
-
-            <Skeleton className="h-px w-full" />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="space-y-2">
-                  <Skeleton className="h-4 w-16" />
-                  <Skeleton className="h-5 w-24" />
-                </div>
-              ))}
-            </div>
-
-            <Skeleton className="h-px w-full" />
-
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <Skeleton className="h-4 w-16" />
-                <div className="flex items-center gap-3">
-                  <Skeleton className="h-10 w-10" />
-                  <Skeleton className="h-6 w-12" />
-                  <Skeleton className="h-10 w-10" />
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <Skeleton className="h-14 flex-1" />
-                <Skeleton className="h-14 w-24" />
-                <Skeleton className="h-14 w-24" />
-              </div>
-
-              <div className="space-y-1">
-                <Skeleton className="h-4 w-48" />
-                <Skeleton className="h-4 w-40" />
-                <Skeleton className="h-4 w-32" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Reviews */}
-        <div className="mb-24">
-          <Skeleton className="h-8 w-48 mb-8" />
-          <div className="space-y-6">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <Skeleton className="h-10 w-10 rounded-full" />
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-3 w-24" />
-                  </div>
-                </div>
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Related Products */}
-        <div>
-          <Skeleton className="h-8 w-48 mb-8" />
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="space-y-3">
-                <Skeleton className="aspect-square rounded-lg" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-3 w-1/3" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
+import { Heart, Share2 } from "lucide-react"
+import { ProductDetailSkeleton } from "@/components/product/Skeleton"
 
 export default function ProductDetailPage() {
   const params = useParams()
   const slug = params.slug as string
-  const [quantity, setQuantity] = useState(1)
 
   const { product, relatedProducts, reviews, isLoading, isError } = useProduct(slug)
 
@@ -181,10 +67,10 @@ export default function ProductDetailPage() {
 
             {/* Info */}
             <div className="space-y-8">
-              <div>
-                <Badge className="mb-3 text-sm px-3 py-1">{product.room_type.replace("_", " ").toUpperCase()}</Badge>
-                <h1 className="text-3xl lg:text-4xl font-serif font-bold mb-4 leading-tight">{product.name}</h1>
-                <div className="flex items-center gap-4 mb-6">
+              <div className="mb-2">
+                <Badge className="mb-1 text-sm px-3 py-1">{product.room_type.replace("_", " ").toUpperCase()}</Badge>
+                <h1 className="text-3xl lg:text-4xl font-serif font-bold mb-2 leading-tight">{product.name}</h1>
+                <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center gap-1">
                     <span className="text-yellow-500 text-lg">★</span>
                     <span className="font-semibold text-lg">{Number(product.rating).toFixed(1)}</span>
@@ -195,8 +81,8 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
-              <div className="bg-muted/50 rounded-lg p-6">
-                <div className="flex items-baseline gap-4 mb-4">
+              <div className="bg-muted/50 rounded-lg px-6 py-3 mb-3">
+                <div className="flex items-baseline gap-4 mb-2">
                   <span className="text-3xl lg:text-4xl font-bold text-primary">${Number(product.price).toFixed(2)}</span>
                   {product.original_price && (
                     <>
@@ -220,16 +106,16 @@ export default function ProductDetailPage() {
               </div>
 
               {product.description && (
-                <div>
-                  <h3 className="font-semibold text-lg mb-3">Product Description</h3>
+                <div className="mb-2">
+                  <h3 className="font-semibold text-lg mb-2">Product Description</h3>
                   <p className="text-muted-foreground leading-relaxed text-base">{product.description}</p>
                 </div>
               )}
 
-              <Separator />
+              <Separator className="mb-2" />
 
               {/* Product Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
                 {product.material && (
                   <div className="flex flex-col">
                     <span className="text-sm text-muted-foreground font-medium mb-1">Material</span>
@@ -254,47 +140,27 @@ export default function ProductDetailPage() {
                 )}
               </div>
 
-              <Separator />
+              <Separator className="mb-2" />
 
               {/* Quantity and Actions */}
               <div className="space-y-6">
-                {product.stock > 0 && (
-                  <div>
-                    <label className="block text-sm font-medium mb-3">Quantity</label>
-                    <div className="flex items-center gap-3">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        disabled={quantity <= 1}
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <span className="w-12 text-center font-semibold text-lg">{quantity}</span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                        disabled={quantity >= product.stock}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                )}
+                <AddToCart
+                  product={{
+                    id: product.id,
+                    name: product.name,
+                    slug: product.slug,
+                    price: product.price,
+                    image_url: product.image_url,
+                    material: product.material || 'Not specified',
+                    color: product.color || 'Not specified',
+                    stock: product.stock,
+                  }}
+                  showQuantityControl
+                  size="lg"
+                  className="w-full py-6 text-lg flex-1"
+                />
 
-                <div className="flex flex-col sm:flex-row gap-3">
-                  {product.stock > 0 ? (
-                    <Button size="lg" className="flex-1 text-lg py-6">
-                      <ShoppingCart className="mr-2 h-5 w-5" />
-                      Add to Cart - ${Number(product.price * quantity).toFixed(2)}
-                    </Button>
-                  ) : (
-                    <Button size="lg" className="flex-1 text-lg py-6" disabled>
-                      Out of Stock
-                    </Button>
-                  )}
-
+                <div className="flex gap-3">
                   <Button variant="outline" size="lg" className="sm:w-auto px-6">
                     <Heart className="mr-2 h-5 w-5" />
                     Wishlist
