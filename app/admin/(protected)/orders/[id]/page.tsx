@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { formatVND } from "@/lib/utils"
 import Link from "next/link"
 import { ArrowLeft, Package, User, MapPin, CreditCard } from "lucide-react"
 import { getOrderById, getOrderItems } from "@/lib/services/orders"
@@ -81,8 +82,8 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
                     <p className="text-sm text-neutral-600">Quantity: {item.quantity}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium text-neutral-900">${Number(item.total_price).toFixed(2)}</p>
-                    <p className="text-sm text-neutral-600">${Number(item.unit_price).toFixed(2)} each</p>
+                    <p className="font-medium text-neutral-900">{formatVND(Number(item.total_price))}</p>
+                    <p className="text-sm text-neutral-600">{formatVND(Number(item.unit_price))} each</p>
                   </div>
                 </div>
               ))}
@@ -91,7 +92,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
             <div className="mt-6 pt-6 border-t border-neutral-200">
               <div className="flex items-center justify-between text-lg font-bold">
                 <span>Total</span>
-                <span>${Number(order.total_amount).toFixed(2)}</span>
+                <span>{formatVND(Number(order.total_amount))}</span>
               </div>
             </div>
           </div>

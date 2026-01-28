@@ -24,3 +24,11 @@ export {
   sanitizeInput,
 } from "./validation"
 export type { RateLimitResult } from "./validation"
+
+// Currency utilities
+export {
+  formatVND,
+  parseVND,
+  displayPrice,
+  CURRENCY,
+} from "./currency"

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Minus, Plus, Trash2 } from 'lucide-react'
 import { CartItem } from '@/hooks/useCart'
+import { formatVND } from '@/lib/utils'
 
 interface CartItemRowProps {
   item: CartItem
@@ -75,10 +76,10 @@ export function CartItemRow({
       <div className="flex flex-col items-end justify-between">
         <div className="text-right">
           <p className="text-lg font-bold text-primary">
-            ${itemTotal.toFixed(2)}
+            {formatVND(itemTotal)}
           </p>
           <p className="text-xs text-muted-foreground">
-            ${Number(item.price).toFixed(2)} each
+            {formatVND(Number(item.price))} each
           </p>
         </div>
         <button

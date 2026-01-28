@@ -1,6 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
+import { formatVND } from "@/lib/utils"
 import type { Product } from "@/lib/db"
 
 interface ProductCardProps {
@@ -33,9 +34,9 @@ export function ProductCard({ product }: ProductCardProps) {
         <h3 className="font-semibold line-clamp-2 group-hover:text-primary transition-colors">{product.name}</h3>
 
         <div className="flex items-center gap-2">
-          <span className="text-lg font-bold">${Number(product.price).toFixed(2)}</span>
+          <span className="text-lg font-bold">{formatVND(Number(product.price))}</span>
           {product.original_price && (
-            <span className="text-sm text-muted-foreground line-through">${Number(product.original_price).toFixed(2)}</span>
+            <span className="text-sm text-muted-foreground line-through">{formatVND(Number(product.original_price))}</span>
           )}
         </div>
 

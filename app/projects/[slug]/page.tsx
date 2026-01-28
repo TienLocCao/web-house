@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/Footer"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { formatVND } from "@/lib/utils"
 import { useProject } from "@/lib/hooks"
 import { Calendar, MapPin, User, DollarSign, Phone, Mail } from "lucide-react"
 import { ProjectDetailSkeleton } from "@/components/project/Skeleton"
@@ -105,7 +106,7 @@ export default function ProjectDetailPage() {
                     <Info
                       icon={DollarSign}
                       label="Budget"
-                      value={`$${project.budget.toLocaleString()}`}
+                      value={formatVND(project.budget)}
                     />
                   )}
                 </div>

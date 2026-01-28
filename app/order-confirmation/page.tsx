@@ -8,6 +8,7 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { formatVND } from '@/lib/utils'
 import { Suspense } from 'react'
 import Loading from './loading'
 import { Check, Package, Truck, MapPin, Mail, Phone, Download, ArrowRight } from 'lucide-react'
@@ -166,7 +167,7 @@ export default function OrderConfirmationPage() {
                           <p className="font-semibold">{item.name}</p>
                           <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                           <p className="text-sm font-medium text-primary mt-1">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            {formatVND(item.price * item.quantity)}
                           </p>
                         </div>
                       </div>
@@ -182,21 +183,21 @@ export default function OrderConfirmationPage() {
                   <CardContent className="space-y-4">
                     <div className="flex justify-between pb-3 border-b">
                       <span className="text-muted-foreground">Subtotal</span>
-                      <span className="font-semibold">${order.payment.subtotal.toFixed(2)}</span>
+                      <span className="font-semibold">{formatVND(order.payment.subtotal)}</span>
                     </div>
                     <div className="flex justify-between pb-3 border-b">
                       <span className="text-muted-foreground">Shipping</span>
                       <span className="font-semibold">
-                        {order.payment.shipping === 0 ? 'FREE' : `$${order.payment.shipping.toFixed(2)}`}
+                        {order.payment.shipping === 0 ? 'FREE' : formatVND(order.payment.shipping)}
                       </span>
                     </div>
                     <div className="flex justify-between pb-3 border-b">
                       <span className="text-muted-foreground">Tax</span>
-                      <span className="font-semibold">${order.payment.tax.toFixed(2)}</span>
+                      <span className="font-semibold">{formatVND(order.payment.tax)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="font-semibold">Total</span>
-                      <span className="text-2xl font-bold text-primary">${order.payment.total.toFixed(2)}</span>
+                      <span className="text-2xl font-bold text-primary">{formatVND(order.payment.total)}</span>
                     </div>
                   </CardContent>
                 </Card>
