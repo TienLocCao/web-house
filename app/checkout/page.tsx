@@ -14,6 +14,7 @@ import { AlertCircle, Loader2, MapPin, Package } from 'lucide-react'
 import { useToast } from '@/hooks/useToast'
 import { useCart, type CartItem } from '@/hooks/useCart'
 import { calculateOrderTotal } from '@/lib/utils/cart'
+import { formatVND } from '@/lib/utils'
 import { OrderSummarySidebar } from '@/components/shop/OrderSummarySidebar'
 
 interface CheckoutFormData {
@@ -165,7 +166,7 @@ export default function CheckoutPage() {
   }
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-  const shipping = subtotal > 500 ? 0 : 45
+  const shipping = subtotal > 5_000_000 ? 0 : 50_000
   const tax = subtotal * 0.1
   const total = subtotal + shipping + tax
 

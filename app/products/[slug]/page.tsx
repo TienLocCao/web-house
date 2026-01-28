@@ -8,6 +8,7 @@ import { Footer } from "@/components/layout/Footer"
 import { ProductCard } from "@/components/shop/ProductCard"
 import { AddToCart } from "@/components/shop/AddToCart"
 import { useProduct } from "@/lib/hooks"
+import { formatVND } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
@@ -83,14 +84,14 @@ export default function ProductDetailPage() {
 
               <div className="bg-muted/50 rounded-lg px-6 py-3 mb-3">
                 <div className="flex items-baseline gap-4 mb-2">
-                  <span className="text-3xl lg:text-4xl font-bold text-primary">${Number(product.price).toFixed(2)}</span>
+                  <span className="text-3xl lg:text-4xl font-bold text-primary">{formatVND(Number(product.price))}</span>
                   {product.original_price && (
                     <>
                       <span className="text-xl text-muted-foreground line-through">
-                        ${Number(product.original_price).toFixed(2)}
+                        {formatVND(Number(product.original_price))}
                       </span>
                       <Badge variant="destructive" className="text-sm">
-                        Save ${Number(product.original_price - product.price).toFixed(2)}
+                        Save {formatVND(Number(product.original_price - product.price))}
                       </Badge>
                     </>
                   )}

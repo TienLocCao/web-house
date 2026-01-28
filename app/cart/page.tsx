@@ -15,6 +15,7 @@ import {
   validatePromoCode,
   getFreeShippingMessage,
 } from '@/lib/utils/cart'
+import { formatVND } from '@/lib/utils'
 
 export default function CartPage() {
   const { toast } = useToast()
@@ -160,31 +161,31 @@ export default function CartPage() {
             <div className="space-y-3 mb-6 pb-6 border-b">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span className="font-semibold">${orderTotal.subtotal.toFixed(2)}</span>
+                <span className="font-semibold">{formatVND(orderTotal.subtotal)}</span>
               </div>
 
               {orderTotal.discount > 0 && (
                 <div className="flex justify-between text-sm text-green-600">
                   <span>Discount ({(discount * 100).toFixed(0)}%)</span>
-                  <span className="font-semibold">-${orderTotal.discount.toFixed(2)}</span>
+                  <span className="font-semibold">-{formatVND(orderTotal.discount)}</span>
                 </div>
               )}
 
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Estimated Shipping</span>
-                <span className="font-semibold">{orderTotal.shipping === 0 ? 'FREE' : `$${orderTotal.shipping.toFixed(2)}`}</span>
+                <span className="font-semibold">{orderTotal.shipping === 0 ? 'FREE' : formatVND(orderTotal.shipping)}</span>
               </div>
 
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Estimated Tax</span>
-                <span className="font-semibold">${orderTotal.tax.toFixed(2)}</span>
+                <span className="font-semibold">{formatVND(orderTotal.tax)}</span>
               </div>
             </div>
 
             <div className="mb-6">
               <div className="flex justify-between text-lg font-bold">
                 <span>Total</span>
-                <span className="text-primary text-xl">${orderTotal.total.toFixed(2)}</span>
+                <span className="text-primary text-xl">{formatVND(orderTotal.total)}</span>
               </div>
             </div>
 
@@ -298,7 +299,7 @@ export default function CartPage() {
                       {product.name}
                     </h3>
                     <p className="text-lg font-bold text-primary mt-2">
-                      ${Number(product.price).toFixed(2)}
+                      {formatVND(Number(product.price))}
                     </p>
                     <Button size="sm" variant="outline" className="mt-3 w-full">
                       Add to Cart

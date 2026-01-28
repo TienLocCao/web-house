@@ -92,7 +92,7 @@ export async function GET(
           (sum: number, item: any) => sum + (Number(item.unit_price) * Number(item.quantity)),
           0
         ),
-        shipping: order.total_amount > 500 ? 0 : 45,
+        shipping: order.total_amount > 5_000_000 ? 0 : 50_000,
         tax: Math.round((order.total_amount * 0.1) * 100) / 100,
         total: Number(order.total_amount),
       },

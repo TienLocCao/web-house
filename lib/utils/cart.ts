@@ -2,6 +2,11 @@
  * Cart utilities - Pure functions for cart calculations
  */
 
+// Currency constants (VND)
+const SHIPPING_THRESHOLD = 5_000_000 // 5 million VND
+const SHIPPING_COST = 50_000 // 50k VND
+const TAX_RATE = 0.1 // 10%
+
 export interface CartItem {
   id: number
   name: string
@@ -22,16 +27,16 @@ export function calculateSubtotal(items: CartItem[]): number {
 
 /**
  * Calculate shipping cost
- * Free shipping for orders over $500
+ * Free shipping for orders over 5,000,000 VND
  */
-export function calculateShipping(subtotal: number, threshold = 500, cost = 45): number {
+export function calculateShipping(subtotal: number, threshold = SHIPPING_THRESHOLD, cost = SHIPPING_COST): number {
   return subtotal > threshold ? 0 : cost
 }
 
 /**
  * Calculate tax (10%)
  */
-export function calculateTax(subtotal: number, rate = 0.1): number {
+export function calculateTax(subtotal: number, rate = TAX_RATE): number {
   return Math.round((subtotal * rate) * 100) / 100
 }
 
@@ -82,9 +87,9 @@ export interface OrderTotal {
 export function calculateOrderTotal(
   items: CartItem[],
   promoCodeDiscount = 0,
-  taxRate = 0.1,
-  shippingThreshold = 500,
-  shippingCost = 45
+  taxRate = TAX_RATE,
+  shippingThreshold = SHIPPING_THRESHOLD,
+  shippingCost = SHIPPING_COST
 ): OrderTotal {
   const subtotal = calculateSubtotal(items)
   const discount = calculateDiscount(subtotal, promoCodeDiscount)
@@ -105,12 +110,12 @@ export function calculateOrderTotal(
 /**
  * Get free shipping threshold message
  */
-export function getFreeShippingMessage(subtotal: number, threshold = 500): string | null {
+export function getFreeShippingMessage(subtotal: number, threshold = SHIPPING_THRESHOLD): string | null {
   if (subtotal >= threshold) {
     return '✓ Free shipping applied!'
   }
   const remaining = threshold - subtotal
-  return `Add $${remaining.toFixed(2)} more for FREE shipping!`
+  return `Add ${remaining.toLocaleString('vi-VN')}₫ more for FREE shipping!`
 }
 
 /**
