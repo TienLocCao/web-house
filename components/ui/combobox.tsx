@@ -56,7 +56,7 @@ export function Combobox({
   isLoading,
   onLoadMore,
 
-  debounceMs = 300,
+  debounceMs = 3000,
 }: ComboboxProps) {
   const [search, setSearch] = React.useState("")
   const debouncedSearch = useDebounce(search, debounceMs)
