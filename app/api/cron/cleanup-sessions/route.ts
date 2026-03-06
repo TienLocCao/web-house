@@ -10,6 +10,7 @@ export async function GET(req: Request) {
     if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    console.log("Starting cleanup sessions...");
 
     // gọi stored procedure cleanup
     await sql`CALL sp_cleanup_bulk_sessions();`;
