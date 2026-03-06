@@ -1,7 +1,7 @@
 name: Cleanup DB Sessions
 on:
-  schedule:
-    - cron: '0 * * * *' # Chạy mỗi giờ
+  # schedule:
+    # - cron: '0 * * * *' # Chạy mỗi giờ
   workflow_dispatch: # Cho phép bấm chạy bằng tay trên Github UI
 
 jobs:
