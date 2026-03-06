@@ -10,5 +10,5 @@ jobs:
     steps:
       - name: Triger Next.js Cleanup API
         run: |
-          curl -X GET "https://ten-domain-cua-ban.com/api/cron/cleanup-sessions" \
+          curl -X GET "http://localhost:3000/api/cron/cleanup-sessions" \
           -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
