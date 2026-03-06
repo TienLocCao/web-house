@@ -11,6 +11,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     console.log("Starting cleanup sessions...");
+    console.log("Starting cleanup sessions333...");
 
     // gọi stored procedure cleanup
     await sql`CALL sp_cleanup_bulk_sessions();`;
