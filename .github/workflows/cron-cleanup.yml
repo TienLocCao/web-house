@@ -1,0 +1,14 @@
+name: Cleanup DB Sessions
+on:
+  schedule:
+    - cron: '0 * * * *' # Chạy mỗi giờ
+  workflow_dispatch: # Cho phép bấm chạy bằng tay trên Github UI
+
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Triger Next.js Cleanup API
+        run: |
+          curl -X GET "https://ten-domain-cua-ban.com/api/cron/cleanup-sessions" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
