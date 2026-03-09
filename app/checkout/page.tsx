@@ -28,7 +28,7 @@ interface CheckoutFormData {
   zipCode: string
   country: string
   billingAddress: boolean
-  paymentMethod: 'credit-card' | 'bank-transfer' | 'paypal'
+  paymentMethod: 'cod'
 }
 
 const initialFormData: CheckoutFormData = {
@@ -42,7 +42,7 @@ const initialFormData: CheckoutFormData = {
   zipCode: '',
   country: 'Vietnam',
   billingAddress: false,
-  paymentMethod: 'credit-card',
+  paymentMethod: 'cod',
 }
 
 export default function CheckoutPage() {
@@ -128,17 +128,15 @@ export default function CheckoutPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData),
       })
+      const data = await response.json()
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to create order')
+        throw new Error(data.error || 'Failed to create order')
       }
 
-      const { id: orderId } = await response.json()
-
+      const orderId = data.order.id
       // Clear cart
       clearCart()
-
       // Redirect to confirmation
       router.push(`/order-confirmation?orderId=${orderId}`)
     } catch (err: any) {
@@ -324,39 +322,30 @@ export default function CheckoutPage() {
                 </CardContent>
               </Card>
 
-              {/* Payment Method */}
+                            {/* Payment Method */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
-                      3
+                      1
                     </div>
                     Payment Method
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
-                    {[
-                      { value: 'credit-card', label: 'Credit Card', icon: '💳' },
-                      { value: 'bank-transfer', label: 'Bank Transfer', icon: '🏦' },
-                      { value: 'paypal', label: 'PayPal', icon: '🔵' },
-                    ].map(method => (
-                      <label key={method.value} className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-muted transition-colors" style={{
-                        borderColor: formData.paymentMethod === method.value ? 'var(--primary)' : undefined,
-                        backgroundColor: formData.paymentMethod === method.value ? 'var(--muted)' : undefined,
-                      }}>
-                        <input
-                          type="radio"
-                          name="paymentMethod"
-                          value={method.value}
-                          checked={formData.paymentMethod === method.value}
-                          onChange={handleInputChange}
-                          className="w-4 h-4"
-                        />
-                        <span className="text-xl">{method.icon}</span>
-                        <span className="font-medium">{method.label}</span>
-                      </label>
-                    ))}
+                    <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer bg-muted border-primary">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="cod"
+                        checked={true}
+                        readOnly
+                        className="w-4 h-4"
+                      />
+                      <span className="text-xl">🚚</span>
+                      <span className="font-medium">Cash on Delivery (COD) / Pay on Arrival</span>
+                    </label>
                   </div>
                 </CardContent>
               </Card>
@@ -374,7 +363,7 @@ export default function CheckoutPage() {
                     Processing...
                   </>
                 ) : (
-                  'Complete Purchase'
+                  'Order Online'
                 )}
               </Button>
             </form>

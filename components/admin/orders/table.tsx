@@ -8,8 +8,7 @@ import { useToast } from "@/hooks/useToast"
 import { CoreTable } from "@/components/core/CoreTable"
 import type { Column, SortItem } from "@/lib/types/table"
 import type { Order } from "@/lib/types/order"
-import { secureFetchJSON } from "@/lib/utils"
-
+import { secureFetchJSON, formatVND } from "@/lib/utils"
 import {
   Select,
   SelectTrigger,
@@ -70,7 +69,7 @@ export function OrdersTable({ initialData, initialTotal, search, status }: Order
       key: "total_amount",
       header: "Total",
       sortable: true,
-      render: (row) => `$${Number(row.total_amount).toFixed(2)}`,
+      render: (row) => `$${formatVND(Number(row.total_amount))}`,
     },
     {
       key: "status",
@@ -164,31 +163,33 @@ export function OrdersTable({ initialData, initialTotal, search, status }: Order
     setUpdating(orderId)
 
     try {
-      const response = await secureFetchJSON(`/api/admin/orders/${orderId}/status`, {
+      await secureFetchJSON(`/api/admin/orders/${orderId}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       })
 
-      if (response.ok) {
-        toast({ title: "Status updated", type: "success" })
-        // Refetch data
-        const params = new URLSearchParams()
-        params.set("page", String(page))
-        params.set("limit", String(limit))
-        params.set("sort", JSON.stringify(sort))
-        if (search) params.set("search", search)
-        if (status) params.set("status", status)
+      toast({ title: "Status updated", type: "success" })
 
-        const json: { items: Order[]; total: number } = await secureFetchJSON(`/api/admin/orders?${params.toString()}`)
-        setData(json.items)
-      } else {
-        const json = await response.json().catch(() => null)
-        toast({ title: json?.error || "Failed to update order status", type: "error" })
-      }
-    } catch (error) {
-      console.error("Status update error:", error)
-      toast({ title: "An error occurred", type: "error" })
+      const params = new URLSearchParams()
+      params.set("page", String(page))
+      params.set("limit", String(limit))
+      params.set("sort", JSON.stringify(sort))
+      if (search) params.set("search", search)
+      if (status) params.set("status", status)
+
+      const json = await secureFetchJSON<{ items: Order[]; total: number }>(
+        `/api/admin/orders?${params.toString()}`
+      )
+
+      setData(json.items)
+    } catch (err: any) {
+      console.error("Status update error:", err)
+      toast({
+        title: "Failed to update order status",
+        description: String(err),
+        type: "error",
+      })
     } finally {
       setUpdating(null)
     }

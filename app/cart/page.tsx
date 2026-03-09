@@ -12,7 +12,6 @@ import { useCart, type CartItem } from '@/hooks/useCart'
 import { CartItemRow } from '@/components/shop/CartItemRow'
 import { 
   calculateOrderTotal, 
-  validatePromoCode,
   getFreeShippingMessage,
 } from '@/lib/utils/cart'
 import { formatVND } from '@/lib/utils'
@@ -22,10 +21,7 @@ export default function CartPage() {
   const { cart, updateQuantity, removeItem } = useCart()
   
   const [loading, setLoading] = useState(true)
-  const [promoCode, setPromoCode] = useState('')
   const [discount, setDiscount] = useState(0)
-  const [promoApplied, setPromoApplied] = useState(false)
-  const [promoError, setPromoError] = useState('')
   const [recommendedProducts, setRecommendedProducts] = useState<any[]>([])
   const [recommendedLoading, setRecommendedLoading] = useState(false)
 
@@ -66,30 +62,7 @@ export default function CartPage() {
     fetchRecommended()
   }, [])
 
-  const applyPromoCode = () => {
-    setPromoError('')
-    setPromoApplied(false)
-    
-    if (!promoCode.trim()) {
-      setPromoError('Please enter a promo code')
-      return
-    }
-
-    const result = validatePromoCode(promoCode)
-    if (result) {
-      setDiscount(result.discount)
-      setPromoApplied(true)
-      setPromoCode('')
-      toast({
-        title: 'Promo Code Applied',
-        description: `Discount of ${result.discount * 100}% has been applied!`,
-        type: 'success',
-      })
-    } else {
-      setPromoError('Invalid promo code. Try: WELCOME20, SAVE10, SUMMER15')
-      setDiscount(0)
-    }
-  }
+  
 
   // Calculate totals using utility function
   const orderTotal = calculateOrderTotal(cart, discount)
@@ -189,54 +162,7 @@ export default function CartPage() {
               </div>
             </div>
 
-            {/* Promo Code Input */}
-            <div className="mb-6 pb-6 border-b">
-              <label className="text-sm font-semibold block mb-3">PROMO CODE</label>
-              <div className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={promoCode}
-                  onChange={e => setPromoCode(e.target.value)}
-                  onKeyPress={e => e.key === 'Enter' && applyPromoCode()}
-                  placeholder="Enter code"
-                  disabled={promoApplied}
-                  className="flex-1 rounded-lg border px-3 py-2 text-sm disabled:opacity-50 disabled:bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                <Button
-                  variant={promoApplied ? "outline" : "default"}
-                  size="sm"
-                  onClick={applyPromoCode}
-                  disabled={promoApplied}
-                  className="whitespace-nowrap"
-                >
-                  {promoApplied ? (
-                    <>
-                      <Check className="w-4 h-4 mr-1" />
-                      Applied
-                    </>
-                  ) : (
-                    'APPLY'
-                  )}
-                </Button>
-              </div>
-              {promoError && (
-                <div className="flex items-center gap-2 text-red-600 text-xs mt-2">
-                  <AlertCircle className="w-3 h-3" />
-                  {promoError}
-                </div>
-              )}
-              {promoApplied && (
-                <div className="flex items-center gap-2 text-green-600 text-xs mt-2">
-                  <Check className="w-3 h-3" />
-                  Promo code applied successfully!
-                </div>
-              )}
-              <p className="text-xs text-muted-foreground mt-2">
-                Try: WELCOME20, SAVE10, SUMMER15, or VIPFREE
-              </p>
-            </div>
-
-            <Link href="/checkout" className="w-full block mb-3">
+                        <Link href="/checkout" className="w-full block mb-3">
               <Button className="w-full" size="lg" disabled={cart.length === 0}>
                 PROCEED TO CHECKOUT →
               </Button>

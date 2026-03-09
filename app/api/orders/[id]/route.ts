@@ -10,6 +10,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const data = await params;
     // Rate limiting
     const ip = getClientIP(request)
     const rate = rateLimit(`order_${ip}`, {
@@ -24,7 +25,7 @@ export async function GET(
       )
     }
 
-    const orderId = parseInt(params.id)
+    const orderId = parseInt(data.id)
 
     if (isNaN(orderId)) {
       return NextResponse.json(

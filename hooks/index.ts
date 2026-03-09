@@ -16,11 +16,9 @@ export {
   getFreeShippingMessage,
   findCartItem,
   getCartStats,
-  validatePromoCode,
 } from '@/lib/utils/cart'
 
 export type {
-  PromoCode,
   OrderTotal,
   CartStats,
 } from '@/lib/utils/cart'

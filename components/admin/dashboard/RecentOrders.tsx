@@ -2,7 +2,7 @@ import { sql } from "@/lib/db"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
-
+import { formatVND } from "@/lib/utils"
 export async function RecentOrders() {
   const orders = await sql`
     SELECT id, order_number, customer_name, total_amount, status, created_at
@@ -47,7 +47,7 @@ export async function RecentOrders() {
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[order.status]}`}>
                   {order.status}
                 </span>
-                <p className="text-sm font-semibold text-neutral-900">${Number(order.total_amount).toFixed(2)}</p>
+                <p className="text-sm font-semibold text-neutral-900">${formatVND(Number(order.total_amount))}</p>
               </div>
             </div>
           ))

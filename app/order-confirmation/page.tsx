@@ -314,7 +314,7 @@ export default function OrderConfirmationPage() {
                           {product.name}
                         </h3>
                         <p className="text-lg font-bold text-primary mt-2">
-                          ${Number(product.price).toFixed(2)}
+                          ${formatVND(Number(product.price))}
                         </p>
                       </Link>
                     ))}

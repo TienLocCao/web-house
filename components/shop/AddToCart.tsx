@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Minus, Plus, ShoppingCart, Loader2 } from 'lucide-react'
 import { useCart, type CartItem } from '@/hooks/useCart'
 import { useToast } from '@/hooks/useToast'
+import { formatVND } from "@/lib/utils"
 
 interface AddToCartProps {
   product: {
@@ -151,7 +152,7 @@ export function AddToCart({
         ) : (
           <>
             <ShoppingCart className="mr-2 h-4 w-4" />
-            Add to Cart{quantity > 1 ? ` (${quantity})` : ''} - ${(product.price * quantity).toFixed(2)}
+            Add to Cart{quantity > 1 ? ` (${quantity})` : ''} - ${formatVND(product.price * quantity)}
           </>
         )}
       </Button>

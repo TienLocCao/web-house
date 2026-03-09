@@ -41,35 +41,9 @@ export function calculateTax(subtotal: number, rate = TAX_RATE): number {
 }
 
 /**
- * Apply promo code discount
- */
-export interface PromoCode {
-  code: string
-  discount: number // 0-1 (20% = 0.2)
-}
-
-const VALID_PROMO_CODES: Record<string, number> = {
-  'WELCOME20': 0.2,
-  'SAVE10': 0.1,
-  'SUMMER15': 0.15,
-  'VIPFREE': 0,
-}
-
-export function validatePromoCode(code: string): PromoCode | null {
-  const upperCode = code.toUpperCase().trim()
-  if (upperCode in VALID_PROMO_CODES) {
-    return {
-      code: upperCode,
-      discount: VALID_PROMO_CODES[upperCode],
-    }
-  }
-  return null
-}
-
-/**
  * Calculate discount amount
  */
-export function calculateDiscount(subtotal: number, discountRate: number): number {
+export function calculateDiscount(subtotal: number, discountRate: number = 0): number {
   return Math.round((subtotal * discountRate) * 100) / 100
 }
 
@@ -86,13 +60,12 @@ export interface OrderTotal {
 
 export function calculateOrderTotal(
   items: CartItem[],
-  promoCodeDiscount = 0,
   taxRate = TAX_RATE,
   shippingThreshold = SHIPPING_THRESHOLD,
   shippingCost = SHIPPING_COST
 ): OrderTotal {
   const subtotal = calculateSubtotal(items)
-  const discount = calculateDiscount(subtotal, promoCodeDiscount)
+  const discount = calculateDiscount(subtotal)
   const afterDiscount = subtotal - discount
   const shipping = calculateShipping(afterDiscount, shippingThreshold, shippingCost)
   const tax = calculateTax(afterDiscount + shipping, taxRate)
