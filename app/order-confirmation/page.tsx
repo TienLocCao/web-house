@@ -44,16 +44,16 @@ interface OrderData {
 
 export default function OrderConfirmationPage() {
   const searchParams = useSearchParams()
-  const orderId = searchParams.get('orderId')
+  const orderNumber = searchParams.get('orderNumber')
   const [order, setOrder] = useState<OrderData | null>(null)
   const [loading, setLoading] = useState(true)
   const [recommendedProducts, setRecommendedProducts] = useState<any[]>([])
 
   useEffect(() => {
-    if (orderId) {
+    if (orderNumber) {
       const fetchOrder = async () => {
         try {
-          const response = await fetch(`/api/orders/${orderId}`)
+          const response = await fetch(`/api/orders/${orderNumber}`)
           if (response.ok) {
             const data = await response.json()
             setOrder(data)
@@ -67,7 +67,7 @@ export default function OrderConfirmationPage() {
 
       fetchOrder()
     }
-  }, [orderId])
+  }, [orderNumber])
 
   // Fetch recommended products
   useEffect(() => {
@@ -99,7 +99,7 @@ export default function OrderConfirmationPage() {
             </div>
           </div>
           <h1 className="text-4xl font-bold text-primary mb-2">Thank you for your order!</h1>
-          <p className="text-lg text-muted-foreground mb-2">Order #{orderId}</p>
+          <p className="text-lg text-muted-foreground mb-2">Order #{orderNumber}</p>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Your home is about to become more beautiful. A confirmation email with full tracking details has been sent to your inbox.
           </p>
@@ -133,9 +133,14 @@ export default function OrderConfirmationPage() {
                         )}
                       </div>
                       {idx < 3 && (
-                        <div className="absolute top-6 -right-2 w-full h-0.5 bg-muted" style={{
-                          backgroundColor: step.status === 'completed' ? '#10b981' : undefined
-                        }} />
+                        <div className="absolute top-6 w-full h-0.5">
+                          <div className="absolute -left-2 w-[calc(50%_-_15px)] h-full bg-muted" style={{
+                            backgroundColor: step.status === 'completed' ? '#10b981' : undefined
+                          }} />
+                          <div className="absolute -right-2 w-[calc(50%_-_15px)] h-full bg-muted" style={{
+                            backgroundColor: step.status === 'completed' ? '#10b981' : undefined
+                          }} />
+                        </div>
                       )}
                     </div>
                   ))}

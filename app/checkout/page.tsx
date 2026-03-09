@@ -61,7 +61,7 @@ export default function CheckoutPage() {
     if (cart.length === 0) {
       router.push('/cart')
     }
-  }, [cart, router])
+  }, [])
 
   const validateForm = (): boolean => {
     const newErrors: Partial<CheckoutFormData> = {}
@@ -134,11 +134,11 @@ export default function CheckoutPage() {
         throw new Error(data.error || 'Failed to create order')
       }
 
-      const orderId = data.order.id
+      const orderNumber = data.order.order_number
       // Clear cart
-      clearCart()
+      // clearCart()
       // Redirect to confirmation
-      router.push(`/order-confirmation?orderId=${orderId}`)
+      router.push(`/order-confirmation?orderNumber=${orderNumber}`)
     } catch (err: any) {
       console.error('Checkout error:', err)
       toast({

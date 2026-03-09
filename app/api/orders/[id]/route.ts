@@ -25,9 +25,8 @@ export async function GET(
       )
     }
 
-    const orderId = parseInt(data.id)
-
-    if (isNaN(orderId)) {
+    const orderNumber = data.id
+    if (!orderNumber) {
       return NextResponse.json(
         { error: "Invalid order ID" },
         { status: 400 },
@@ -36,9 +35,8 @@ export async function GET(
 
     // Get order
     const [order] = await sql`
-      SELECT * FROM orders WHERE id = ${orderId}
+      SELECT * FROM orders WHERE order_number = ${orderNumber}
     `
-
     if (!order) {
       return NextResponse.json(
         { error: "Order not found" },
@@ -57,7 +55,7 @@ export async function GET(
         p.image_url
       FROM order_items oi
       LEFT JOIN products p ON oi.product_id = p.id
-      WHERE oi.order_id = ${orderId}
+      WHERE oi.id = ${order.id}
       ORDER BY oi.id
     `
 
@@ -65,7 +63,7 @@ export async function GET(
     let shippingAddress = {}
     if (order.shipping_address) {
       try {
-        shippingAddress = JSON.parse(order.shipping_address)
+        shippingAddress = order.shipping_address
       } catch (err) {
         console.error("Failed to parse shipping_address:", err)
       }
