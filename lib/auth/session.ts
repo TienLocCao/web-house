@@ -14,7 +14,7 @@ export async function createSession(
   userAgent?: string
 ): Promise<string> {
   const sessionToken = nanoid(64)
-  const expiresAt = new Date(Date.now() + SESSION_DURATION)
+    const expiresAt = new Date(Date.now() + SESSION_DURATION)
 
   await sql`
     INSERT INTO admin_sessions (
@@ -28,7 +28,7 @@ export async function createSession(
     VALUES (
       ${adminId},
       ${sessionToken},
-      ${expiresAt},
+      NOW() + (${SESSION_DURATION / 1000} * INTERVAL '1 second'),
       ${ipAddress || null},
       ${userAgent || null},
       NOW()
@@ -38,10 +38,10 @@ export async function createSession(
   const isProd = process.env.NODE_ENV === "production"
   const cookieStore = await cookies()
 
-  cookieStore.set("admin_session", sessionToken, {
+    cookieStore.set("admin_session", sessionToken, {
     httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? "none" : "lax",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
     expires: expiresAt,
     path: "/",
   })
@@ -66,17 +66,17 @@ export async function refreshSession(): Promise<boolean> {
 
     if (!session) return false
 
-    const expiresAt = new Date(Date.now() + SESSION_DURATION)
-    await sql`UPDATE admin_sessions SET expires_at = ${expiresAt} WHERE id = ${session.id}`
+        const expiresAt = new Date(Date.now() + SESSION_DURATION)
+    await sql`UPDATE admin_sessions SET expires_at = NOW() + (${SESSION_DURATION / 1000} * INTERVAL '1 second') WHERE id = ${session.id}`
 
     const isProd = process.env.NODE_ENV === "production"
-    cookieStore.set("admin_session", sessionToken, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? "none" : "lax",
-      expires: expiresAt,
-      path: "/",
-    })
+      cookieStore.set("admin_session", sessionToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    expires: expiresAt,
+    path: "/",
+  })
 
     return true
   } catch (error) {

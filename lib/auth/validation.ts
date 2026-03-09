@@ -28,7 +28,7 @@ export async function validateSessionFromRequest(
       JOIN admin_users u ON u.id = s.admin_id
       WHERE s.session_token = ${sessionToken}
         AND s.expires_at > NOW()
-        AND s.last_activity_at > NOW() - (${IDLE_TIMEOUT_MINUTES} * INTERVAL '1 minute')
+        AND EXTRACT(EPOCH FROM (NOW() - s.last_activity_at)) / 60 < ${IDLE_TIMEOUT_MINUTES}
     `
 
     if (!session || !session.is_active) return null
@@ -65,7 +65,7 @@ export async function validateSessionForLogin() {
     FROM admin_sessions
     WHERE session_token = ${token}
       AND expires_at > NOW()
-      AND last_activity_at > NOW() - (${IDLE_TIMEOUT_MINUTES} * INTERVAL '1 minute')
+      AND EXTRACT(EPOCH FROM (NOW() - last_activity_at)) / 60 < ${IDLE_TIMEOUT_MINUTES}
   `
 
   return session ?? null
@@ -91,7 +91,7 @@ export async function validateSession(): Promise<AdminUser | null> {
     JOIN admin_users u ON u.id = s.admin_id
     WHERE s.session_token = ${token}
       AND s.expires_at > NOW()
-      AND s.last_activity_at > NOW() - (${IDLE_TIMEOUT_MINUTES} * INTERVAL '1 minute')
+              AND EXTRACT(EPOCH FROM (NOW() - s.last_activity_at)) / 60 < ${IDLE_TIMEOUT_MINUTES}
   `
 
   if (!session || !session.is_active) return null
