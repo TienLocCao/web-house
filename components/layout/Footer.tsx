@@ -174,9 +174,9 @@ export function Footer() {
               <div>
                 <h4 className="font-bold mb-3">Contact Info</h4>
                 <ul className="space-y-2 text-sm opacity-80">
-                  <li>Email: info@laroastudio.com</li>
-                  <li>Phone: +1 (555) 123-4567</li>
-                  <li>Address: 123 Design Street</li>
+                  <li>Email: caotienloc0310@gmail.com</li>
+                  <li>Phone: +84 773544937</li>
+                  <li>Address: HCM</li>
                 </ul>
               </div>
               <div>

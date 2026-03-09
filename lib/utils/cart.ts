@@ -87,8 +87,12 @@ export function getFreeShippingMessage(subtotal: number, threshold = SHIPPING_TH
   if (subtotal >= threshold) {
     return '✓ Free shipping applied!'
   }
-  const remaining = threshold - subtotal
-  return `Add ${remaining.toLocaleString('vi-VN')}₫ more for FREE shipping!`
+  const remaining = Math.round(threshold - subtotal)
+
+  return `Add ${remaining.toLocaleString('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+  })} more for FREE shipping!`
 }
 
 /**
