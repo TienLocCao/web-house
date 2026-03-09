@@ -7,6 +7,7 @@ export interface Product {
   price: number
   original_price: number | null
   category_id: number | null
+  category_name: string | null
   room_type: string
   image_url: string
   gallery: string[]
