@@ -30,24 +30,10 @@ import { ImageUploader } from "@/components/admin/products/ImageUploader"
 import { uploadImage, deleteImage } from "@/lib/services/imageUpload"
 import { CategoriesCombobox } from "@/components/admin/categories/CategoriesCombobox"
 import { useCategories, Category } from "@/components/admin/categories/useCategories"
-import type { Product } from "@/lib/types/product"
+import { useProductForm, EMPTY_FORM } from "@/hooks/admin/products/useProductForm"
+import type { Product, ProductFormState } from "@/lib/types/product"
 import type { GalleryItem } from "@/lib/types/media"
 import GalleryUploader from "@/components/admin/shared/GalleryUploader"
-
-type ProductFormState = {
-  name: string
-  slug: string
-  category: Category | null
-  category_id: string
-  room_type: string
-  price: string
-  stock: string
-  is_featured: boolean
-  is_available: boolean
-  image_url: string
-  gallery: GalleryItem[]
-  description: string
-}
 
 type ProductPayload = {
   name: string
@@ -61,24 +47,6 @@ type ProductPayload = {
   image_url?: string
   gallery: string[]
   description?: string
-}
-
-const EMPTY_FORM: ProductFormState = {
-  name: "",
-  slug: "",
-  category_id: "",
-  room_type: "",
-  price: "0",
-  stock: "0",
-  is_featured: false,
-  is_available: true,
-  image_url: "",
-  gallery: [],
-  description: "",
-  category: {
-    id: 0,
-    name: "",
-  },
 }
 
 type ProductDialogMode = "create" | "edit"
@@ -102,7 +70,13 @@ export default function ProductCreateEditDialog({
   const { values: roomTypes, isLoading: roomTypesLoading } = useRoomTypes()
 
   // ===== form =====
-  const [form, setForm] = useState<ProductFormState>(EMPTY_FORM)
+  const { form, setForm, updateField } = useProductForm(undefined, (key) => {
+    setFieldErrors((prev) => {
+      const n = { ...prev }
+      delete n[key]
+      return n
+    })
+  })
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
 
   // ===== ui =====
@@ -157,18 +131,6 @@ export default function ProductCreateEditDialog({
     }
     setFieldErrors({})
   }, [product, open, ensureCategory])
-
-    function updateField<K extends keyof ProductFormState>(
-      key: K,
-      value: ProductFormState[K]
-    ) {
-      setForm((prev) => ({ ...prev, [key]: value }))
-      setFieldErrors((prev) => {
-        const n = { ...prev }
-        delete n[key]
-        return n
-      })
-    }
 
   function applyFieldErrors(errors: any[]) {
     const errs: Record<string, string[]> = {}

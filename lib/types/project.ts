@@ -30,3 +30,18 @@ export interface Project {
 
   featured: boolean
 }
+
+export type ProjectFormState = {
+  title: string
+  slug: string
+  client_name?: string
+  location?: string
+  description?: string
+  image_url: string
+  gallery: GalleryItem[]
+  room_type?: string
+  status?: ProjectStatus
+  completion_date?: string
+  budget?: string
+  featured?: boolean
+}

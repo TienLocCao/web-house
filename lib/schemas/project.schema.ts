@@ -3,8 +3,8 @@ import { z } from "zod"
 export const ProjectStatusEnum = z.enum(["completed", "in_progress", "planned"])
 
 export const ProjectCreateSchema = z.object({
-  title: z.string().min(1),
-  slug: z.string().min(1),
+  title: z.string().min(1, "Title is required"),
+  slug: z.string().min(1, "Slug is required"),
   description: z.string().optional().nullable(),
   client_name: z.string().optional().nullable(),
   location: z.string().optional().nullable(),

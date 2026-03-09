@@ -20,3 +20,20 @@ export interface Product {
   created_at: Date
   updated_at: Date
 }
+
+import type { GalleryItem } from "@/lib/types/media"
+
+export type ProductFormState = {
+  name: string
+  slug: string
+  category: any // TODO: import Category type if needed
+  category_id: string
+  room_type: string
+  price: string
+  stock: string
+  is_featured: boolean
+  is_available: boolean
+  image_url: string
+  gallery: GalleryItem[]
+  description: string
+}

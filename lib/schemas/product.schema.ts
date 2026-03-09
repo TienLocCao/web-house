@@ -13,15 +13,15 @@ export const RoomTypeEnum = z.enum([
  * CREATE – POST
  */
 export const ProductCreateSchema = z.object({
-  name: z.string().min(1),
-  slug: z.string().min(1),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().min(1, "Slug is required"),
 
   description: z.string().optional().nullable(),
 
   price: z.number().min(0).default(0),
 
   original_price: z.number().positive().optional().nullable(),
-  category_id: z.number().int().optional().nullable(),
+  category_id: z.number().int().min(1, "Category is required"),
 
   room_type: RoomTypeEnum,
 

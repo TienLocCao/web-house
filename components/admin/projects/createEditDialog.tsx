@@ -26,44 +26,15 @@ import { ImageUploader } from "@/components/admin/products/ImageUploader"
 import GalleryUploader from "@/components/admin/shared/GalleryUploader"
 import { uploadImage, deleteImage } from "@/lib/services/imageUpload"
 import { useRoomTypes } from "@/hooks/useRoomTypes"
-import type { Project, ProjectStatus } from "@/lib/types/project"
+import { useProjectForm, EMPTY_FORM } from "@/hooks/admin/projects/useProjectForm"
+import type { Project, ProjectStatus, ProjectFormState } from "@/lib/types/project"
 import type { GalleryItem } from "@/lib/types/media"
 import type {
   ProjectCreate,
   ProjectUpdate,
 } from "@/lib/schemas/project.schema"
 
-type FormState = {
-  title: string
-  slug: string
-  client_name?: string
-  location?: string
-  description?: string
-  image_url: string
-  gallery: GalleryItem[]
-  room_type?: string
-  status?: ProjectStatus
-  completion_date?: string
-  budget?: string
-  featured?: boolean
-}
-
 type ProjectPayload = ProjectCreate | ProjectUpdate
-
-const EMPTY_FORM: FormState = {
-  title: "",
-  slug: "",
-  client_name: "",
-  location: "",
-  description: "",
-  image_url: "",
-  gallery: [],
-  room_type: "",
-  status: "completed",
-  completion_date: "",
-  budget: "",
-  featured: false,
-}
 
 type ProjectDialogMode = "create" | "edit"
 
@@ -85,7 +56,13 @@ export default function ProjectCreateEditDialog({
   const { toast } = useToast()
   const { values: roomTypes } = useRoomTypes()
 
-  const [form, setForm] = useState<FormState>(EMPTY_FORM)
+  const { form, setForm, updateField } = useProjectForm(undefined, (key) => {
+    setFieldErrors((prev) => {
+      const n = { ...prev }
+      delete n[key]
+      return n
+    })
+  })
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
   const [saving, setSaving] = useState(false)
 
@@ -145,15 +122,6 @@ export default function ProjectCreateEditDialog({
     }
     setFieldErrors({})
   }, [project, open])
-
-  function updateField<K extends keyof FormState>(key: K, v: FormState[K]) {
-    setForm((p) => ({ ...p, [key]: v }))
-    setFieldErrors((prev) => {
-      const n = { ...prev }
-      delete n[key]
-      return n
-    })
-  }
 
   function slugify(v: string) {
     return v
