@@ -16,7 +16,7 @@ export const adminNavigation:adminNavigationType[] = [
   { name: "Reviews", href: "/admin/reviews", icon: Star },
   { name: "Projects", href: "/admin/projects", icon: FolderOpen },
   { name: "Contacts", href: "/admin/contacts", icon: MessageSquare },
-  { name: "Customers", href: "/admin/customers", icon: Users },
+  // { name: "Customers", href: "/admin/customers", icon: Users },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ]
 

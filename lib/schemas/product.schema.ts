@@ -27,7 +27,7 @@ export const ProductCreateSchema = z.object({
 
   image_url: z.string(),
 
-  gallery: z.array(z.string().url()).optional().default([]),
+  gallery: z.array(z.string()).optional().default([]),
 
   stock: z.number().int().min(0),
 

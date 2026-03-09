@@ -3,22 +3,20 @@
 import { useRef, useState } from "react"
 import { uploadImage, deleteImage } from "@/lib/services/imageUpload"
 import { Button } from "@/components/ui/button"
-
-export type GalleryItem = {
-  id: string
-  url: string
-}
+import type { GalleryItem } from "@/lib/types/media"
 
 type Props = {
   value: GalleryItem[]
   onChange: (items: GalleryItem[]) => void
   max?: number
+  folder?: string
 }
 
 export default function GalleryUploader({
   value,
   onChange,
   max = 10,
+  folder,
 }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -36,7 +34,7 @@ export default function GalleryUploader({
 
     try {
       for (const file of fileArray) {
-        const url = await uploadImage(file)
+        const url = await uploadImage(file, undefined, folder)
         uploaded.push({
           id: crypto.randomUUID(),
           url,

@@ -1,16 +1,8 @@
 // lib/types/project.ts
 
-export type ProjectStatus = "completed" | "ongoing" | "draft"
+import type { GalleryItem } from "@/lib/types/media"
 
-/**
- * Item trong gallery
- * upload xong → chỉ cần url
- */
-export interface GalleryItem {
-  id: string
-  url: string
-  status?: "uploading" | "done" | "error"
-}
+export type ProjectStatus = "completed" | "in_progress" | "planned"
 
 /**
  * Project form + API payload

@@ -28,6 +28,7 @@ export async function getProducts({
       p.is_featured,
       p.is_available,
       p.image_url,
+      p.gallery,
       p.room_type,
       p.category_id AS category_id,
       c.name AS category_name,
