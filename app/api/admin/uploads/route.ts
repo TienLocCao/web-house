@@ -7,14 +7,6 @@ import { deleteImageByUrl } from "@/lib/server/file-system"
 
 export const runtime = "nodejs"
 
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '50mb',
-    },
-  },
-}
-
 export const POST = (request: NextRequest) =>
   withAdminAuth(request, async (admin) => {
     const form = await request.formData()

@@ -18,7 +18,7 @@ export const ProductCreateSchema = z.object({
 
   description: z.string().optional().nullable(),
 
-  price: z.number().min(0).default(0),
+  price: z.number().min(1).default(0),
 
   original_price: z.number().positive().optional().nullable(),
   category_id: z.number().int().min(1, "Category is required"),

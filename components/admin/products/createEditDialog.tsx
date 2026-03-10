@@ -34,6 +34,9 @@ import { useProductForm, EMPTY_FORM } from "@/hooks/admin/products/useProductFor
 import type { Product, ProductFormState } from "@/lib/types/product"
 import type { GalleryItem } from "@/lib/types/media"
 import GalleryUploader from "@/components/admin/shared/GalleryUploader"
+import { useDirtyForm } from "@/lib/hooks/useDirtyForm"
+import { SaveConfirmationDialog } from "./SaveConfirmationDialog"
+import { DiscardConfirmationDialog } from "./DiscardConfirmationDialog"
 
 type ProductPayload = {
   name: string
@@ -78,9 +81,26 @@ export default function ProductCreateEditDialog({
     })
   })
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
+  const { isDirty, markClean } = useDirtyForm(form, {
+    normalize: (v: ProductFormState) => ({
+      name: v.name,
+      slug: v.slug,
+      category_id: v.category_id,
+      room_type: v.room_type,
+      price: v.price,
+      stock: v.stock,
+      is_featured: v.is_featured,
+      is_available: v.is_available,
+      image_url: v.image_url,
+      gallery: v.gallery.map((g: GalleryItem) => g.url),
+      description: v.description,
+    }),
+  })
 
   // ===== ui =====
   const [saving, setSaving] = useState(false)
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false)
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
 
   const imageFileRef = useRef<File | null>(null)
   /** ảnh đã tồn tại ban đầu (cover + gallery cũ) */
@@ -100,7 +120,7 @@ export default function ProductCreateEditDialog({
   useEffect(() => {
     if (product) {
       const categoryId = String(product.category_id ?? "")
-      setForm({
+      const nextForm: ProductFormState = {
         name: product.name ?? "",
         slug: product.slug ?? "",
         category: null,
@@ -116,7 +136,9 @@ export default function ProductCreateEditDialog({
           url,
         })),
         description: product.description ?? "",
-      })
+      }
+      setForm(nextForm)
+      markClean(nextForm)
 
       initialImagesRef.current = [
         product.image_url,
@@ -125,6 +147,7 @@ export default function ProductCreateEditDialog({
       newlyUploadedRef.current = []
     } else {
       setForm(EMPTY_FORM)
+      markClean(EMPTY_FORM)
       imageFileRef.current = null
       initialImagesRef.current = []
       newlyUploadedRef.current = []
@@ -179,6 +202,12 @@ export default function ProductCreateEditDialog({
   // ===== submit =====
   async function handleSubmit(e?: FormEvent) {
     e?.preventDefault()
+    if (!isDirty) return
+    setShowSaveConfirm(true)
+  }
+
+  async function confirmSave() {
+    setShowSaveConfirm(false)
     setSaving(true)
     setFieldErrors({})
 
@@ -222,6 +251,7 @@ export default function ProductCreateEditDialog({
         type: "success",
       })
 
+      markClean()
       onOpenChange(false)
       onSaved?.()
     } catch (err: any) {
@@ -236,9 +266,9 @@ export default function ProductCreateEditDialog({
     }
   }
   // =========================
-  // Cancel → cleanup
+  // Close / Cancel → cleanup
   // =========================
-  async function handleCancel() {
+  async function cleanupUnsavedImages() {
     const currentUrls = [
       form.image_url,
       ...form.gallery.map((g) => g.url),
@@ -249,11 +279,33 @@ export default function ProductCreateEditDialog({
     )
 
     await Promise.allSettled(toDelete.map((u: string) => deleteImage(u)))
+  }
+
+  async function closeWithConfirmAndCleanup() {
+    if (isDirty) {
+      setShowDiscardConfirm(true)
+      return
+    }
+    await cleanupUnsavedImages()
     onOpenChange(false)
+  }
+
+  async function confirmDiscard() {
+    setShowDiscardConfirm(false)
+    await cleanupUnsavedImages()
+    onOpenChange(false)
+  }
+
+  function handleDialogOpenChange(nextOpen: boolean) {
+    if (nextOpen) {
+      onOpenChange(true)
+      return
+    }
+    void closeWithConfirmAndCleanup()
   }
   // ===== render =====
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger asChild>
         <span />
       </DialogTrigger>
@@ -264,7 +316,10 @@ export default function ProductCreateEditDialog({
           </DialogTitle>
           <DialogDescription>Nhập thông tin sản phẩm</DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 px-6 flex-shrink-1 overflow-y-auto">
+        <form
+          onSubmit={handleSubmit}
+          className="flex-1 space-y-4 px-6 overflow-y-auto"
+        >
           <div className="grid gap-4">
             <div>
               <Label className="pb-2">Name</Label>
@@ -407,22 +462,39 @@ export default function ProductCreateEditDialog({
               onChange={(e) => updateField("description", e.target.value)}
             />
           </div>
+
+          <DialogFooter className="sticky bottom-0 flex-shrink-0 bg-white py-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void closeWithConfirmAndCleanup()}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={saving || !isDirty}
+              className="w-full sm:w-auto"
+            >
+              {saving ? "Saving..." : "Save"}
+            </Button>
+          </DialogFooter>
         </form>
-        <DialogFooter className="flex-shrink-0 px-6 py-4 bg-white">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleCancel}
-            className="w-[50%]"
-          >
-            Cancel
-          </Button>
-          <Button type="submit" disabled={saving} className="w-[50%]" onClick={() => handleSubmit()}>
-            {saving ? "Saving..." : "Save"}
-          </Button>
-        </DialogFooter>
-        
       </DialogContent>
+
+      <SaveConfirmationDialog
+        open={showSaveConfirm}
+        onOpenChange={setShowSaveConfirm}
+        onConfirm={confirmSave}
+      />
+
+      <DiscardConfirmationDialog
+        open={showDiscardConfirm}
+        onOpenChange={setShowDiscardConfirm}
+        onConfirm={confirmDiscard}
+      />
+
     </Dialog>
   )
 }
