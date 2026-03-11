@@ -7,7 +7,7 @@ import { deleteImageByUrl } from "@/lib/server/file-system"
 
 export const runtime = "nodejs"
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return withAdminAuth(request, async (admin) => {
     if (!["super_admin", "admin"].includes(admin.role)) {
       return NextResponse.json(
@@ -50,7 +50,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   })
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return withAdminAuth(req, async (admin) => {
     if (!["super_admin", "admin"].includes(admin.role)) {
       return NextResponse.json(

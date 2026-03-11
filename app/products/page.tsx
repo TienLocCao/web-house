@@ -94,32 +94,49 @@ export default function ProductsPage() {
       <section className="py-12 lg:py-16">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-            <div className="lg:col-span-3">
-              <label className="text-sm font-medium text-muted-foreground">Filter by Room:</label>
-              <div className="space-y-2 mt-2">
-                {[
-                  { value: 'bedroom', label: 'Bedroom' },
-                  { value: 'living_room', label: 'Living Room' },
-                  { value: 'dining_room', label: 'Dining Room' },
-                  { value: 'office', label: 'Office' },
-                ].map((room) => (
-                  <div key={room.value} className="flex items-center space-x-2 mb-4">
-                    <Checkbox
-                      id={room.value}
-                      checked={filterBy.includes(room.value)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setFilterBy([...filterBy, room.value])
-                        } else {
-                          setFilterBy(filterBy.filter(f => f !== room.value))
-                        }
-                      }}
-                    />
-                    <label htmlFor={room.value} className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      {room.label}
-                    </label>
-                  </div>
-                ))}
+            <div className="lg:col-span-3 lg:pr-6 xl:pr-8">
+
+              <div className="rounded-xl border bg-white shadow-sm p-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-primary-500">🔻</span>
+                  <h3 className="font-semibold text-gray-800">Categories</h3>
+                </div>
+
+                <div className="space-y-1">
+                  {[
+                    { value: 'bedroom', label: 'Bedroom' },
+                    { value: 'living_room', label: 'Living Room' },
+                    { value: 'dining_room', label: 'Dining Room' },
+                    { value: 'office', label: 'Office' },
+                  ].map((item) => {
+                    const active = filterBy.includes(item.value)
+
+                    return (
+                      <div
+                        key={item.value}
+                        onClick={() => {
+                          if (active) {
+                            setFilterBy(filterBy.filter((f) => f !== item.value))
+                          } else {
+                            setFilterBy([...filterBy, item.value])
+                          }
+                        }}
+                        className={`
+                          flex items-center justify-between
+                          px-3 py-2 rounded-lg cursor-pointer
+                          transition
+                          ${
+                            active
+                              ? "bg-muted text-primary font-medium"
+                              : "text-gray-600 hover:bg-gray-100"
+                          }
+                        `}
+                      >
+                        <span>{item.label}</span>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             </div>
             <div className="lg:col-span-9">

@@ -10,7 +10,7 @@ const StatusUpdateSchema = z.object({
 })
 
 // PATCH /api/admin/orders/[id]/status - Update order status
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return withAdminAuth(request, async (admin) => {
     if (!["super_admin", "admin"].includes(admin.role)) {
       return NextResponse.json(
@@ -19,7 +19,8 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       )
     }
     try {
-      const orderId = Number.parseInt(params.id)
+      const { id } = await params
+      const orderId = Number.parseInt(id)
     const body = await request.json()
     const { status } = StatusUpdateSchema.parse(body)
 

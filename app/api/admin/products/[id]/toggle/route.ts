@@ -5,7 +5,7 @@ import { withAdminAuth } from "@/lib/middleware"
 export const runtime = "edge"
 
 // PATCH /api/admin/products/[id]/toggle - Toggle product availability
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return withAdminAuth(request, async (admin) => {
     try {
       if (!["super_admin", "admin"].includes(admin.role)) {

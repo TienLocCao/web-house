@@ -5,10 +5,11 @@ import { withAdminAuth } from "@/lib/middleware"
 export const runtime = "edge"
 
 // PATCH /api/admin/reviews/[id]/approve - Approve review
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return withAdminAuth(request, async (admin) => {
     try {
-      const reviewId = Number.parseInt(params.id)
+      const { id } = await params
+      const reviewId = Number.parseInt(id)
 
     await sql`UPDATE reviews SET is_approved = true WHERE id = ${reviewId}`
 
