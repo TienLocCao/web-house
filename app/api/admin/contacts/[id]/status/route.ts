@@ -5,9 +5,9 @@ import { withAdminAuth } from "@/lib/middleware"
 export const runtime = "edge"
 
 // PATCH /api/admin/contacts/[id]/status - Update contact status
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return withAdminAuth(request, async (admin) => {
-    params = await params;
+    const { id } = await params;
     if (!["super_admin", "admin"].includes(admin.role)) {
       return NextResponse.json(
         { message: "Forbidden" },
@@ -15,7 +15,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       )
     }
     try {
-      const contactId = Number.parseInt(params.id)
+      const contactId = Number.parseInt(id)
     const { status } = await request.json()
 
     await sql`UPDATE contact_inquiries SET status = ${status} WHERE id = ${contactId}`

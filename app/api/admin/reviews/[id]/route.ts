@@ -5,10 +5,11 @@ import { withAdminAuth } from "@/lib/middleware"
 export const runtime = "edge"
 
 // DELETE /api/admin/reviews/[id]
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return withAdminAuth(request, async (admin) => {
     try {
-      const reviewId = Number.parseInt(params.id)
+      const { id } = await params
+      const reviewId = Number.parseInt(id)
 
     // Get product_id before deleting
     const [review] = await sql`SELECT product_id FROM reviews WHERE id = ${reviewId}`

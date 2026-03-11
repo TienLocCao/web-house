@@ -7,7 +7,7 @@ export const runtime = "edge"
 // GET /api/orders/[id] - Get order details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const data = await params;

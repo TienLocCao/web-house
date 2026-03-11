@@ -2,17 +2,23 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Menu, X, ShoppingCart } from "lucide-react"
+import { Menu, X, ShoppingCart, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/hooks/useCart"
+import { useUserAuth } from "@/hooks"
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const { cart } = useCart()
+  const { user, logout } = useUserAuth()
   
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
+  
+  const handleLogout = async () => {
+    await logout()
+  }
 
   useEffect(() => {
     setMounted(true)
@@ -71,9 +77,29 @@ export function Header() {
                 )}
               </Button>
             </Link>
-            <Link href="/products">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Shop Now</Button>
-            </Link>
+            
+            {mounted && user ? (
+              <div className="flex items-center gap-2">
+                <Link href="/profile">
+                  <Button variant="ghost" size="sm">
+                    <User className="h-4 w-4 mr-2" />
+                    {user.name}
+                  </Button>
+                </Link>
+                <Button variant="ghost" size="sm" onClick={handleLogout}>
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link href="/login">
+                  <Button variant="ghost" size="sm">Sign In</Button>
+                </Link>
+                <Link href="/register">
+                  <Button size="sm">Sign Up</Button>
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -112,9 +138,38 @@ export function Header() {
                   )}
                 </Button>
               </Link>
-              <Link href="/products" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button className="w-full mt-4">Shop Now</Button>
-              </Link>
+              
+              {mounted && user ? (
+                <>
+                  <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="ghost" size="sm" className="w-full justify-start">
+                      <User className="h-5 w-5 mr-2" />
+                      {user.name}
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="w-full justify-start text-red-600 hover:text-red-700"
+                    onClick={() => {
+                      handleLogout()
+                      setIsMobileMenuOpen(false)
+                    }}
+                  >
+                    <LogOut className="h-5 w-5 mr-2" />
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="ghost" size="sm" className="w-full justify-start">Sign In</Button>
+                  </Link>
+                  <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button className="w-full mt-4">Sign Up</Button>
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
         )}

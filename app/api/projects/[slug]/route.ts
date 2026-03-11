@@ -8,10 +8,10 @@ export const dynamic = "force-dynamic"
 // GET /api/projects/[slug]
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    params = await params
+    const { slug } = await params
     /* ================= Rate limit ================= */
     const ip = getClientIP(request)
     const rate = rateLimit(`project_${ip}`, {
@@ -22,8 +22,6 @@ export async function GET(
     if (!rate.success) {
       return NextResponse.json({ error: "Too many requests" }, { status: 429 })
     }
-
-    const slug = params.slug
 
     /* ================= PROJECT QUERY ================= */
     const [project] = await sql`

@@ -5,6 +5,8 @@
 
 // Hooks
 export { useCart, type CartItem } from './useCart'
+export { useUserAuth, UserAuthProvider } from './useUserAuth'
+export { useToast } from './useToast'
 
 // Utilities
 export {

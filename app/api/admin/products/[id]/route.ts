@@ -12,7 +12,7 @@ export const runtime = "nodejs";
 // PATCH /api/admin/products/[id]
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   return withAdminAuth(request, async (admin) => {
     if (!["super_admin", "admin"].includes(admin.role)) {
@@ -98,7 +98,7 @@ export async function PATCH(
 // DELETE /api/admin/products/[id]
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   return withAdminAuth(req, async (admin) => {
     if (!["super_admin", "admin"].includes(admin.role)) {

@@ -5,9 +5,9 @@ import { withAdminAuth } from "@/lib/middleware"
 export const runtime = "edge"
 
 // DELETE /api/admin/contacts/[id]
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return withAdminAuth(request, async (admin) => {
-    params = await params;
+    const { id } = await params;
     if (!["super_admin", "admin"].includes(admin.role)) {
       return NextResponse.json(
         { message: "Forbidden" },
@@ -15,7 +15,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       )
     }
     try {
-      const contactId = Number.parseInt(params.id)
+      const contactId = Number.parseInt(id)
 
       await sql`DELETE FROM contact_inquiries WHERE id = ${contactId}`
 
