@@ -36,7 +36,7 @@ export function Header() {
     { label: "Home", href: "/" },
     { label: "Products", href: "/products" },
     { label: "Projects", href: "/projects" },
-    { label: "About", href: "#about" },
+    // { label: "About", href: "#about" },
     { label: "Contact", href: "#contact" },
   ]
 

@@ -2,6 +2,7 @@ import { sql } from "@/lib/db"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Star } from "lucide-react"
+import { Review } from "@/lib/types/review"
 
 export async function RecentReviews() {
   const reviews = await sql`
@@ -27,7 +28,7 @@ export async function RecentReviews() {
         {reviews.length === 0 ? (
           <p className="text-sm text-neutral-500 text-center py-8">No reviews yet</p>
         ) : (
-          reviews.map((review) => (
+          reviews.map((review: Review) => (
             <div key={review.id} className="pb-4 border-b border-neutral-100 last:border-0 last:pb-0">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1 min-w-0">

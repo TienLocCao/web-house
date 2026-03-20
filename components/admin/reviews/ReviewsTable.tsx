@@ -29,7 +29,7 @@ export function ReviewsTable({ reviews }: ReviewsTableProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
       <div className="divide-y divide-neutral-200">
-        {reviews.map((review) => (
+        {reviews.map((review: Review) => (
           <div key={review.id} className="p-6 hover:bg-neutral-50">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">

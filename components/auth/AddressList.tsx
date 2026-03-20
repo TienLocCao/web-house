@@ -33,14 +33,12 @@ export function AddressList() {
         toast({
           title: 'Error',
           description: data.error || 'Failed to delete address',
-          variant: 'destructive',
         });
       }
     } catch (error) {
       toast({
         title: 'Error',
         description: 'Network error occurred',
-        variant: 'destructive',
       });
     }
   };

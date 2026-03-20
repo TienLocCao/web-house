@@ -45,14 +45,7 @@ export function useProductsData({
         const params = new URLSearchParams()
         params.set("page", String(page))
         params.set("limit", String(limit))
-        
-        // Build sort param
-        let sortParam = "newest"
-        if (sort && sort.length > 0) {
-          const s = sort[0]
-          sortParam = s.desc ? `${s.id}_desc` : `${s.id}_asc`
-        }
-        params.set("sort", sortParam)
+        params.set("sort", JSON.stringify(sort))
         
         if (search) params.set("search", search)
         if (roomType) params.set("room_type", roomType)

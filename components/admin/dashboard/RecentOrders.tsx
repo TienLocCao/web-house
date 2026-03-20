@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import { formatVND } from "@/lib/utils"
+import type { Order } from "@/lib/types/order"
 export async function RecentOrders() {
   const orders = await sql`
     SELECT id, order_number, customer_name, total_amount, status, created_at
@@ -34,7 +35,7 @@ export async function RecentOrders() {
         {orders.length === 0 ? (
           <p className="text-sm text-neutral-500 text-center py-8">No orders yet</p>
         ) : (
-          orders.map((order) => (
+          orders.map((order: Order) => (
             <div
               key={order.id}
               className="flex items-center justify-between pb-4 border-b border-neutral-100 last:border-0 last:pb-0"

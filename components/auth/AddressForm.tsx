@@ -66,14 +66,12 @@ export function AddressForm({ address, onSuccess, onCancel }: AddressFormProps) 
         toast({
           title: 'Error',
           description: data.error || 'Failed to save address',
-          variant: 'destructive',
         });
       }
     } catch (error) {
       toast({
         title: 'Error',
         description: 'Network error occurred',
-        variant: 'destructive',
       });
     } finally {
       setLoading(false);

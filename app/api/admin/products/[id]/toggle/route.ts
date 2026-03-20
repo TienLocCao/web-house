@@ -14,10 +14,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           { status: 403 }
         )
       }
-      const productId = Number.parseInt(params.id)
-    const { is_available } = await request.json()
+      const { id } = await params
+      const productId = Number.parseInt(id)
+      const { is_available } = await request.json()
 
-    await sql`UPDATE products SET is_available = ${is_available} WHERE id = ${productId}`
+      await sql`UPDATE products SET is_available = ${is_available} WHERE id = ${productId}`
 
       return NextResponse.json({ message: "Product status updated" })
     } catch (error) {

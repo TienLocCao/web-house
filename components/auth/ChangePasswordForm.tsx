@@ -30,7 +30,6 @@ export function ChangePasswordForm() {
       toast({
         title: 'Error',
         description: 'New passwords do not match',
-        variant: 'destructive',
       });
       return;
     }
@@ -39,7 +38,6 @@ export function ChangePasswordForm() {
       toast({
         title: 'Error',
         description: 'New password must be at least 6 characters',
-        variant: 'destructive',
       });
       return;
     }
@@ -71,14 +69,12 @@ export function ChangePasswordForm() {
         toast({
           title: 'Error',
           description: data.error || 'Failed to change password',
-          variant: 'destructive',
         });
       }
     } catch (error) {
       toast({
         title: 'Error',
         description: 'Network error occurred',
-        variant: 'destructive',
       });
     } finally {
       setLoading(false);

@@ -2,6 +2,7 @@ type OrderOpts = { alias?: string; categoryAlias?: string }
 
 const SORT_WHITELIST: Record<string, (o: OrderOpts) => string> = {
   name: o => `${o.alias ? o.alias + '.' : ''}name`,
+  title: o => `${o.alias ? o.alias + '.' : ''}title`,
   slug: o => `${o.alias ? o.alias + '.' : ''}slug`,
   category_name: o => `${o.categoryAlias ? o.categoryAlias + '.' : ''}name`,
   price: o => `${o.alias ? o.alias + '.' : ''}price`,
@@ -15,14 +16,14 @@ const SORT_WHITELIST: Record<string, (o: OrderOpts) => string> = {
 }
 
 export function buildOrderBy(
-  sort: { key: string; order: "asc" | "desc" }[],
+  sort: { key: string; order: "asc" | "desc"; direction?: "asc" | "desc" }[],
   opts: OrderOpts = {}
 ) {
   if (!sort?.length) return `ORDER BY ${opts.alias ? opts.alias + '.created_at' : 'created_at'} DESC`
 
   const clauses = sort
     .filter(s => SORT_WHITELIST[s.key])
-    .map(s => `${SORT_WHITELIST[s.key](opts)} ${s.order.toUpperCase()}`)
+    .map(s => `${SORT_WHITELIST[s.key](opts)} ${(s.order ?? s.direction)?.toUpperCase()}`)
 
   return clauses.length
     ? `ORDER BY ${clauses.join(", ")}`

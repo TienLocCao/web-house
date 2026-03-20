@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Heart, Share2 } from "lucide-react"
 import { ProductDetailSkeleton } from "@/components/product/Skeleton"
-
+import type { Review } from "@/lib/types/review"
 export default function ProductDetailPage() {
   const params = useParams()
   const slug = params.slug as string
@@ -192,7 +192,7 @@ export default function ProductDetailPage() {
                 </Button>
               </div>
               <div className="space-y-8">
-                {reviews.map((review) => (
+                {reviews.map((review: Review) => (
                   <div key={review.id} className="border rounded-xl p-6 bg-card">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">

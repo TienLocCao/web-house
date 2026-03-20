@@ -55,14 +55,12 @@ export function ProfileForm() {
         toast({
           title: 'Error',
           description: data.error || 'Failed to update profile',
-          variant: 'destructive',
         });
       }
     } catch (error) {
       toast({
         title: 'Error',
         description: 'Network error occurred',
-        variant: 'destructive',
       });
     } finally {
       setLoading(false);
