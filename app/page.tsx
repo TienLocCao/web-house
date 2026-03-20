@@ -2,6 +2,7 @@ import { Header } from "@/components/layout/Header"
 import { HeroSection } from "@/components/home/HeroSection"
 import { WhyUsSection } from "@/components/home/WhyUsSection"
 import { ShopByRoom } from "@/components/shop/ShopByRoom"
+import { StatsDisplay } from "@/components/admin/dashboard/starts/StatsDisplay"
 import ProjectsSection from "@/components/home/ProjectsSection"
 import { Footer } from "@/components/layout/Footer"
 
@@ -48,10 +49,11 @@ export default async function HomePage() {
   return (
     <main className="min-h-screen">
       <Header />
-      <HeroSection initialStats={stats} />
+      <HeroSection />
       <WhyUsSection />
       <ShopByRoom/>
       <ProjectsSection initialProjects={initialProjects} />
+      <StatsDisplay initialStats={stats} />
       <Footer />
     </main>
   )
